@@ -13,10 +13,11 @@ export default function InventoryPage() {
   const [isScanning, setIsScanning] = useState(false);
   const [scannedData, setScannedData] = useState<ProductData | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleScanClick = () => {
-    fileInputRef.current?.click();
+    setIsModalOpen(true);
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,18 +87,45 @@ export default function InventoryPage() {
           <button
             onClick={handleScanClick}
             disabled={isScanning}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-              isScanning ? "bg-accent/50 cursor-not-allowed" : "bg-accent hover:bg-accent/90 text-white"
+            className={`flex items-center space-x-2 px-6 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-accent/20 ${
+              isScanning ? "bg-accent/50 cursor-not-allowed" : "bg-accent hover:bg-accent/90 text-white hover:scale-105 active:scale-95"
             }`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
             <span>{isScanning ? "Scanning..." : "Scan Product"}</span>
-          </button>
-          <button className="bg-foreground/5 hover:bg-foreground/10 text-foreground px-4 py-2 rounded-lg font-medium transition-colors">
-            Add New Item
           </button>
         </div>
       </div>
+
+      {/* Explicit Scan Modal */}
+      {isModalOpen && !previewImage && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-card border border-sidebar-border w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="p-6 text-center">
+              <div className="w-16 h-16 bg-accent/10 text-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+              </div>
+              <h2 className="text-xl font-bold mb-2">Unggah Foto Produk</h2>
+              <p className="text-sm text-foreground/50 mb-6">Ambil foto atau pilih gambar dari galeri untuk dianalisis AI.</p>
+              
+              <div className="space-y-3">
+                <button 
+                  onClick={() => { fileInputRef.current?.click(); setIsModalOpen(false); }}
+                  className="w-full bg-accent text-white py-3 rounded-xl font-bold hover:bg-accent/90 transition-all"
+                >
+                  Pilih dari Galeri
+                </button>
+                <button 
+                  onClick={() => setIsModalOpen(false)}
+                  className="w-full bg-foreground/5 text-foreground py-3 rounded-xl font-bold hover:bg-foreground/10 transition-all"
+                >
+                  Batal
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Scanned Result Form */}
       {previewImage && (
