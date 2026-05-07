@@ -29,6 +29,21 @@ export async function POST(req: NextRequest) {
       description: `Sale of ${db.inventory[productIndex].name} to ${buyerName} (${waNumber})`,
     };
     db.finance.push(newFinanceRecord);
+    
+    // 2.5 Record to Orders
+    const newOrder = {
+      id: newFinanceRecord.id,
+      date: newFinanceRecord.date,
+      productId: productId,
+      productName: db.inventory[productIndex].name,
+      buyerName,
+      waNumber,
+      location,
+      amount: amount,
+      status: "pending" as const,
+    };
+    db.orders = db.orders || [];
+    db.orders.push(newOrder);
 
     saveDB(db);
 

@@ -21,9 +21,22 @@ interface FinanceRecord {
   description: string;
 }
 
+interface Order {
+  id: string;
+  date: string;
+  productId: string;
+  productName: string;
+  buyerName: string;
+  waNumber: string;
+  location: string;
+  amount: number;
+  status: "pending" | "processing" | "shipped" | "delivered";
+}
+
 interface DB {
   inventory: Product[];
   finance: FinanceRecord[];
+  orders: Order[];
 }
 
 const initialData: DB = {
@@ -33,6 +46,7 @@ const initialData: DB = {
     { id: "3", name: "Educational Tablet", category: "Education", price: 1200000, stock: 20, description: "Digital learning for underprivileged students." },
   ],
   finance: [],
+  orders: [],
 };
 
 export function getDB(): DB {
