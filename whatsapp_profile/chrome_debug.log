@@ -1,0 +1,6 @@
+[35476:7936:0507/233630.396:ERROR:ui\gl\direct_composition_support.cc:612] AMD VideoProcessorGetOutputExtension failed: The parameter is incorrect. (0x80070057)
+[35476:7936:0507/233630.400:VERBOSE1:components\viz\service\main\viz_main_impl.cc:86] VizNullHypothesis is disabled (not a warning)
+[35476:14436:0507/233635.563:WARNING:ui\gl\angle_platform_impl.cc:52] HLSLCompiler.cpp:254 (rx::HLSLCompiler::compileToBinary): 
+C:\fakepath(136,3-70): warning X3557: loop only executes for 1 iteration(s), forcing loop to unroll
+
+[42160:43912:0507/233832.988:VERBOSE1:components\viz\service\main\viz_main_impl.cc:86] VizNullHypothesis is disabled (not a warning)
