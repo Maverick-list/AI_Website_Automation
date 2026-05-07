@@ -34,10 +34,9 @@ export async function POST(req: NextRequest) {
     ]);
 
     const response = await result.response;
-    const text = response.text();
-    
-    // Clean up potential markdown code blocks if any
-    const jsonString = text.replace(/```json|```/g, "").trim();
+    const responseText = response.text();
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    const jsonString = jsonMatch ? jsonMatch[0] : responseText;
     const data = JSON.parse(jsonString);
 
     return NextResponse.json(data);

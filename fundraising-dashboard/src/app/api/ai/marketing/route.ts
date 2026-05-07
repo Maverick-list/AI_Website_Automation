@@ -23,10 +23,12 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === "sentiment") {
-      const prompt = `Analisis sentimen dari teks berikut: "${text}". Berikan output dalam format JSON mentah: { "sentiment": "Positive" | "Negative" | "Neutral", "score": 0-100, "insight": "analisis singkat tentang apa yang diinginkan user atau masalahnya" }. Hanya JSON.`;
+      const prompt = `Analisis sentimen dari teks berikut: "${text}". Berikan output dalam format JSON mentah: { "sentiment": "Positive" | "Negative" | "Neutral", "score": 0-100, "insight": "analisis singkat tentang apa yang diinginkan user atau masalahnya" }. Hanya JSON mentah.`;
       const result = await model.generateContent(prompt);
       const response = await result.response;
-      const jsonString = response.text().replace(/```json|```/g, "").trim();
+      const responseText = response.text();
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      const jsonString = jsonMatch ? jsonMatch[0] : responseText;
       return NextResponse.json({ result: JSON.parse(jsonString) });
     }
 
@@ -57,7 +59,9 @@ export async function POST(req: NextRequest) {
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
-      const jsonString = response.text().replace(/```json|```/g, "").trim();
+      const responseText = response.text();
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      const jsonString = jsonMatch ? jsonMatch[0] : responseText;
       return NextResponse.json({ result: JSON.parse(jsonString) });
     }
 
