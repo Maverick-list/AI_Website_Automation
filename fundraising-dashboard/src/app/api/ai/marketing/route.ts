@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
+    console.log("AI API Request received. Key present:", !!apiKey);
     if (!apiKey) {
       return NextResponse.json({ 
         error: "GEMINI_API_KEY not configured on Vercel. Please add it to Environment Variables.",
