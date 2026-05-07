@@ -1,10 +1,14 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-
 export async function POST(req: NextRequest) {
   try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: "GEMINI_API_KEY not configured. Please add it to Vercel environment variables." }, { status: 400 });
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
     const formData = await req.formData();
     const file = formData.get("image") as File;
 

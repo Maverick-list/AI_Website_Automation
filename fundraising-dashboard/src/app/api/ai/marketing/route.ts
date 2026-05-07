@@ -1,10 +1,17 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-
 export async function POST(req: NextRequest) {
   try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ 
+        error: "GEMINI_API_KEY not configured on Vercel. Please add it to Environment Variables.",
+        result: "Mock Data: Strategi kampanye tidak dapat dibuat tanpa API Key."
+      }, { status: 200 }); // Return 200 with error message to avoid crash
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
     const { action, text } = await req.json();
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
