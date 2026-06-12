@@ -1,7 +1,9 @@
 import fs from "fs";
 import path from "path";
 
-const DATA_PATH = path.join(process.cwd(), "data.json");
+const LOCAL_PATH = path.join(process.cwd(), "data.json");
+const SHARED_PATH = path.join(process.cwd(), "..", "data.json");
+const DATA_PATH = fs.existsSync(SHARED_PATH) ? SHARED_PATH : LOCAL_PATH;
 
 interface Product {
   id: string;

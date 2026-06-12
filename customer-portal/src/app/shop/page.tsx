@@ -42,37 +42,43 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6">
-      <header className="py-10">
-        <h1 className="text-3xl font-black tracking-tight">Katalog Produk</h1>
-        <p className="text-foreground/50">Pilih produk yang ingin Anda dukung. Setiap pembelian adalah kontribusi nyata.</p>
+    <div className="max-w-6xl mx-auto px-6 relative">
+      <div className="absolute top-0 left-0 w-full h-96 bg-accent/5 blur-[120px] -z-10" />
+      
+      <header className="py-20 text-center">
+        <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-4">Katalog Kurasi</h1>
+        <p className="text-xl text-white/40 max-w-2xl mx-auto font-medium">Pilih produk berkualitas tinggi yang berdampak langsung pada perubahan positif dunia.</p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-16">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-32">
         {products.map((product) => (
-          <div key={product.id} className="bg-card border border-sidebar-border rounded-3xl overflow-hidden hover:border-accent/30 transition-all group">
-            <div className="h-48 bg-gradient-to-br from-accent/5 to-accent-secondary/5 flex items-center justify-center">
-              <span className="text-6xl group-hover:animate-float">
+          <div key={product.id} className="glass rounded-[40px] overflow-hidden hover:border-accent/50 transition-all group relative">
+            <div className="h-64 bg-gradient-to-br from-white/5 to-transparent flex items-center justify-center relative overflow-hidden">
+              <div className="absolute inset-0 bg-accent/5 group-hover:bg-accent/10 transition-colors" />
+              <span className="text-8xl group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">
                 {product.category === "Hardware" ? "💡" : product.category === "Health" ? "💧" : "📱"}
               </span>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-accent tracking-widest">{product.category}</span>
-                <h3 className="text-xl font-bold mt-1">{product.name}</h3>
-                <p className="text-sm text-foreground/50 mt-1">{product.description}</p>
+              <div className="absolute top-4 right-4 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white/60">
+                In Stock
               </div>
-              <div className="flex items-center justify-between">
+            </div>
+            
+            <div className="p-10 space-y-6">
+              <div>
+                <span className="text-[10px] uppercase font-black text-accent tracking-[0.2em]">{product.category}</span>
+                <h3 className="text-2xl font-black mt-2 tracking-tight">{product.name}</h3>
+                <p className="text-white/40 font-medium text-sm mt-3 leading-relaxed">{product.description}</p>
+              </div>
+              
+              <div className="flex items-end justify-between pt-4 border-t border-white/5">
                 <div>
-                  <p className="text-2xl font-black">Rp {product.price.toLocaleString("id-ID")}</p>
-                  <p className={`text-xs font-bold ${product.stock > 10 ? "text-green-500" : "text-orange-500"}`}>
-                    Stok: {product.stock} unit
-                  </p>
+                  <p className="text-[10px] uppercase font-black text-white/20 tracking-widest mb-1">Price</p>
+                  <p className="text-3xl font-black tracking-tighter">Rp {product.price.toLocaleString("id-ID")}</p>
                 </div>
                 <button
                   onClick={() => { setCheckoutProduct(product); setSuccess(false); setForm({ name: "", wa: "", location: "" }); }}
                   disabled={product.stock <= 0}
-                  className="bg-accent text-white px-6 py-3 rounded-2xl font-bold hover:scale-105 active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-accent/20"
+                  className="bg-white text-black px-8 py-4 rounded-2xl font-black hover:bg-accent hover:text-white transition-all disabled:opacity-50 shadow-xl shadow-white/5 active:scale-95"
                 >
                   Beli
                 </button>
@@ -84,55 +90,59 @@ export default function ShopPage() {
 
       {/* Checkout Modal */}
       {checkoutProduct && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-          <div className="bg-card border border-sidebar-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 backdrop-blur-2xl animate-in fade-in duration-300">
+          <div className="glass w-full max-w-xl rounded-[40px] shadow-[0_0_100px_rgba(0,0,0,0.5)] overflow-hidden">
             {success ? (
-              <div className="p-10 text-center">
-                <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-green-500"><polyline points="20 6 9 17 4 12"/></svg>
+              <div className="p-16 text-center animate-in zoom-in-95 duration-500">
+                <div className="w-24 h-24 bg-accent/20 rounded-[30px] flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-accent/20">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><polyline points="20 6 9 17 4 12"/></svg>
                 </div>
-                <h2 className="text-2xl font-black mb-2">Pesanan Berhasil! 🎉</h2>
-                <p className="text-sm text-foreground/50 mb-2">Konfirmasi akan dikirim ke WhatsApp Anda oleh asisten AI kami.</p>
-                <p className="text-xs text-foreground/30 mb-6">Estimasi pengiriman: 30-60 menit</p>
-                <button onClick={() => setCheckoutProduct(null)} className="bg-accent text-white px-8 py-3 rounded-2xl font-bold">
+                <h2 className="text-4xl font-black mb-4 tracking-tighter">Berhasil! 🎉</h2>
+                <p className="text-white/40 font-medium mb-8 leading-relaxed">Terima kasih atas kontribusi Anda. Asisten AI kami akan segera menghubungi Anda melalui WhatsApp untuk detail pengiriman.</p>
+                <button onClick={() => setCheckoutProduct(null)} className="bg-white text-black px-12 py-5 rounded-2xl font-black text-lg hover:bg-accent hover:text-white transition-all shadow-xl shadow-white/5">
                   Tutup
                 </button>
               </div>
             ) : (
-              <>
-                <div className="p-6 border-b border-sidebar-border bg-foreground/5">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-xl font-bold">Checkout</h2>
-                      <p className="text-sm text-foreground/50">{checkoutProduct.name} - Rp {checkoutProduct.price.toLocaleString("id-ID")}</p>
-                    </div>
-                    <button onClick={() => setCheckoutProduct(null)} className="text-foreground/30 hover:text-foreground">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <div className="flex flex-col md:flex-row h-full max-h-[90vh]">
+                <div className="md:w-1/3 bg-white/5 p-8 flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/5">
+                   <div className="text-6xl mb-6">{checkoutProduct.category === "Hardware" ? "💡" : checkoutProduct.category === "Health" ? "💧" : "📱"}</div>
+                   <h2 className="text-2xl font-black tracking-tighter mb-2">{checkoutProduct.name}</h2>
+                   <p className="text-accent font-black text-xl">Rp {checkoutProduct.price.toLocaleString("id-ID")}</p>
+                </div>
+                <div className="md:w-2/3 p-10 overflow-y-auto">
+                  <div className="flex items-center justify-between mb-8">
+                    <h2 className="text-2xl font-black tracking-tight">Checkout</h2>
+                    <button onClick={() => setCheckoutProduct(null)} className="text-white/20 hover:text-white transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
                   </div>
+                  <form onSubmit={handleCheckout} className="space-y-6">
+                    <div>
+                      <label className="text-[10px] uppercase font-black text-white/30 tracking-widest mb-2 block">Nama Penerima</label>
+                      <input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-accent/50 focus:border-accent/50 outline-none transition-all font-medium" placeholder="Masukkan nama lengkap" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] uppercase font-black text-white/30 tracking-widest mb-2 block">WhatsApp Aktif</label>
+                      <input required value={form.wa} onChange={e => setForm({ ...form, wa: e.target.value })}
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-accent/50 focus:border-accent/50 outline-none transition-all font-medium" placeholder="08xxxxxxxxxx" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] uppercase font-black text-white/30 tracking-widest mb-2 block">Alamat Pengiriman</label>
+                      <textarea required value={form.location} onChange={e => setForm({ ...form, location: e.target.value })}
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-accent/50 focus:border-accent/50 outline-none transition-all font-medium resize-none h-32" placeholder="Alamat lengkap penerima" />
+                    </div>
+                    <button type="submit" disabled={loading}
+                      className="w-full relative group bg-accent text-white py-5 rounded-2xl font-black text-xl shadow-2xl shadow-accent/20 hover:scale-[1.02] active:scale-95 transition-all overflow-hidden">
+                      <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                      <span className="relative z-10 group-hover:text-accent transition-colors">
+                        {loading ? "Memproses..." : "Konfirmasi Pembelian"}
+                      </span>
+                    </button>
+                  </form>
                 </div>
-                <form onSubmit={handleCheckout} className="p-8 space-y-5">
-                  <div>
-                    <label className="text-xs font-bold text-foreground/50 uppercase">Nama Lengkap</label>
-                    <input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
-                      className="w-full bg-foreground/5 border border-sidebar-border rounded-xl px-4 py-3 mt-1 focus:ring-2 focus:ring-accent/50 outline-none" placeholder="Masukkan nama Anda" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-foreground/50 uppercase">Nomor WhatsApp</label>
-                    <input required value={form.wa} onChange={e => setForm({ ...form, wa: e.target.value })}
-                      className="w-full bg-foreground/5 border border-sidebar-border rounded-xl px-4 py-3 mt-1 focus:ring-2 focus:ring-accent/50 outline-none" placeholder="08xxxxxxxxxx" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-foreground/50 uppercase">Alamat Pengiriman</label>
-                    <input required value={form.location} onChange={e => setForm({ ...form, location: e.target.value })}
-                      className="w-full bg-foreground/5 border border-sidebar-border rounded-xl px-4 py-3 mt-1 focus:ring-2 focus:ring-accent/50 outline-none" placeholder="Alamat lengkap" />
-                  </div>
-                  <button type="submit" disabled={loading}
-                    className="w-full bg-accent text-white py-4 rounded-2xl font-black text-lg shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-95 transition-all">
-                    {loading ? <span className="inline-block w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : "Konfirmasi Pesanan"}
-                  </button>
-                </form>
-              </>
+              </div>
             )}
           </div>
         </div>
