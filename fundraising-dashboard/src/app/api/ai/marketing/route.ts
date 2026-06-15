@@ -66,22 +66,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ result: JSON.parse(jsonString) });
     }
 
-    if (action === "schedule") {
-      const { text, time, product } = await req.json();
-      
-      const response = await fetch("http://localhost:5000/webhook/schedule", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, time, product }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Gagal terhubung ke OpenClaw Scheduler");
-      }
-
-      return NextResponse.json({ success: true });
-    }
-
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error: any) {
     console.error("Marketing AI Error:", error);

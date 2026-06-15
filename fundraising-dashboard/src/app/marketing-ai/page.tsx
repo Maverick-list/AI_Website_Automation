@@ -9,8 +9,11 @@ export default function MarketingAIPage() {
   const [loadingCampaign, setLoadingCampaign] = useState(false);
   
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [isSendModalOpen, setIsSendModalOpen] = useState(false);
   const [scheduleData, setScheduleData] = useState({ text: "", time: "", product: "" });
+  const [targetId, setTargetId] = useState("120363401263735503@g.us");
   const [loadingSchedule, setLoadingSchedule] = useState(false);
+  const [loadingSend, setLoadingSend] = useState(false);
 
   const [copyInput, setCopyInput] = useState("");
   const [copyOutput, setCopyOutput] = useState("");
@@ -53,24 +56,46 @@ export default function MarketingAIPage() {
     e.preventDefault();
     setLoadingSchedule(true);
     try {
-      const response = await fetch("/api/ai/marketing", {
+      const response = await fetch("http://localhost:5000/webhook/schedule", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          action: "schedule", 
           text: scheduleData.text,
           time: scheduleData.time,
           product: scheduleData.product
         }),
       });
       const data = await response.json();
-      if (data.error) throw new Error(data.error);
-      alert("Promosi berhasil dijadwalkan di Google Calendar & OpenClaw!");
+      if (!response.ok || data.error) throw new Error(data.error || "Gagal terhubung ke Local Server");
+      alert("Promosi berhasil dijadwalkan via OpenClaw Local Server!");
       setIsScheduleModalOpen(false);
     } catch (e) {
-      alert("Gagal menjadwalkan: " + (e instanceof Error ? e.message : "Unknown error"));
+      alert("Gagal menjadwalkan: " + (e instanceof Error ? e.message : "Pastikan Local Server port 5000 menyala"));
     } finally {
       setLoadingSchedule(false);
+    }
+  };
+
+  const handleSendNow = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoadingSend(true);
+    try {
+      const response = await fetch("http://localhost:5000/webhook/openclaw/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          target: targetId,
+          message: scheduleData.text
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok || data.error) throw new Error(data.error || "Gagal menghubungi Local OpenClaw Server");
+      alert("Pesan berhasil dikirim via OpenClaw!");
+      setIsSendModalOpen(false);
+    } catch (e) {
+      alert("Gagal mengirim: " + (e instanceof Error ? e.message : "Pastikan Local Server port 5000 menyala"));
+    } finally {
+      setLoadingSend(false);
     }
   };
 
@@ -196,6 +221,20 @@ export default function MarketingAIPage() {
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
                     <span>Jadwalkan Post</span>
                   </button>
+                  <button 
+                    onClick={() => {
+                      setScheduleData({ 
+                        text: `*${type.data.hook}*\n\n${type.data.body}\n\n${type.data.cta}`,
+                        time: "",
+                        product: products.filter(p => selectedProductIds.includes(p.id)).map(p => p.name).join(", ")
+                      });
+                      setIsSendModalOpen(true);
+                    }}
+                    className="w-full mt-2 bg-accent text-white hover:bg-accent/90 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-2"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                    <span>Kirim Sekarang</span>
+                  </button>
                 </div>
               </div>
             ))}
@@ -244,6 +283,55 @@ export default function MarketingAIPage() {
                   <span className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
                 ) : (
                   <span>Konfirmasi Jadwal</span>
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Send Now Modal */}
+      {isSendModalOpen && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-card border border-sidebar-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="p-6 border-b border-sidebar-border flex justify-between items-center bg-foreground/5">
+              <h2 className="text-xl font-bold">Kirim Broadcast Sekarang</h2>
+              <button onClick={() => setIsSendModalOpen(false)} className="text-foreground/40 hover:text-foreground">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <form onSubmit={handleSendNow} className="p-8 space-y-6">
+              <div className="bg-accent/5 p-4 rounded-2xl border border-accent/10">
+                <p className="text-xs font-bold text-accent uppercase mb-1">Preview Copy</p>
+                <p className="text-xs text-foreground/70 line-clamp-3 italic">{scheduleData.text}</p>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-foreground/50 uppercase">Nomor Tujuan / ID Grup</label>
+                <input
+                  required
+                  type="text"
+                  value={targetId}
+                  onChange={(e) => setTargetId(e.target.value)}
+                  placeholder="contoh: 120363401263735503@g.us atau 62812xxx@s.whatsapp.net"
+                  className="w-full bg-foreground/5 border border-sidebar-border rounded-xl px-4 py-3 mt-1 focus:ring-2 focus:ring-accent/50 outline-none"
+                />
+              </div>
+
+              <div className="flex items-center space-x-2 text-xs text-foreground/50">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                <span>Akan dikirim menggunakan Local OpenClaw Server di port 5000.</span>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loadingSend}
+                className="w-full bg-accent text-white py-4 rounded-2xl font-black text-lg shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center space-x-2"
+              >
+                {loadingSend ? (
+                  <span className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                ) : (
+                  <span>Kirim Broadcast</span>
                 )}
               </button>
             </form>
