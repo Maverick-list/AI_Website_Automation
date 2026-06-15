@@ -12,6 +12,7 @@ export default function MarketingAIPage() {
   const [isSendModalOpen, setIsSendModalOpen] = useState(false);
   const [scheduleData, setScheduleData] = useState({ text: "", time: "", product: "" });
   const [targetId, setTargetId] = useState("120363401263735503@g.us");
+  const [mediaUrl, setMediaUrl] = useState("");
   const [loadingSchedule, setLoadingSchedule] = useState(false);
   const [loadingSend, setLoadingSend] = useState(false);
 
@@ -21,6 +22,10 @@ export default function MarketingAIPage() {
   const [sentimentOutput, setSentimentOutput] = useState<any>(null);
   const [loadingCopy, setLoadingCopy] = useState(false);
   const [loadingSentiment, setLoadingSentiment] = useState(false);
+
+  const [scrapeUrl, setScrapeUrl] = useState("");
+  const [scrapeOutput, setScrapeOutput] = useState<any>(null);
+  const [loadingScrape, setLoadingScrape] = useState(false);
 
   useEffect(() => {
     fetch("/api/inventory").then(res => res.json()).then(setProducts);
@@ -60,9 +65,12 @@ export default function MarketingAIPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
+          target: targetId,
           text: scheduleData.text,
+          message: scheduleData.text,
           time: scheduleData.time,
-          product: scheduleData.product
+          product: scheduleData.product,
+          media: mediaUrl || undefined
         }),
       });
       const data = await response.json();
@@ -85,7 +93,8 @@ export default function MarketingAIPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           target: targetId,
-          message: scheduleData.text
+          message: scheduleData.text,
+          media: mediaUrl || undefined
         }),
       });
       const data = await response.json();
@@ -130,6 +139,23 @@ export default function MarketingAIPage() {
       alert("Failed to analyze sentiment");
     } finally {
       setLoadingSentiment(false);
+    }
+  };
+
+  const analyzeCompetitor = async () => {
+    setLoadingScrape(true);
+    try {
+      const response = await fetch("/api/ai/scrape", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: scrapeUrl }),
+      });
+      const data = await response.json();
+      setScrapeOutput(data.result);
+    } catch (e) {
+      alert("Failed to analyze competitor");
+    } finally {
+      setLoadingScrape(false);
     }
   };
 
@@ -259,6 +285,29 @@ export default function MarketingAIPage() {
               </div>
 
               <div>
+                <label className="text-xs font-bold text-foreground/50 uppercase">Nomor Tujuan / ID Grup</label>
+                <input
+                  required
+                  type="text"
+                  value={targetId}
+                  onChange={(e) => setTargetId(e.target.value)}
+                  placeholder="contoh: 120363401263735503@g.us"
+                  className="w-full bg-foreground/5 border border-sidebar-border rounded-xl px-4 py-3 mt-1 focus:ring-2 focus:ring-accent/50 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-foreground/50 uppercase">Media Path / URL (Opsional)</label>
+                <input
+                  type="text"
+                  value={mediaUrl}
+                  onChange={(e) => setMediaUrl(e.target.value)}
+                  placeholder="e.g. E:\AI_Automation_Website\EQUIRISE.jpeg"
+                  className="w-full bg-foreground/5 border border-sidebar-border rounded-xl px-4 py-3 mt-1 focus:ring-2 focus:ring-accent/50 outline-none"
+                />
+              </div>
+
+              <div>
                 <label className="text-xs font-bold text-foreground/50 uppercase">Pilih Waktu Posting</label>
                 <input
                   required
@@ -314,6 +363,17 @@ export default function MarketingAIPage() {
                   value={targetId}
                   onChange={(e) => setTargetId(e.target.value)}
                   placeholder="contoh: 120363401263735503@g.us atau 62812xxx@s.whatsapp.net"
+                  className="w-full bg-foreground/5 border border-sidebar-border rounded-xl px-4 py-3 mt-1 focus:ring-2 focus:ring-accent/50 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-foreground/50 uppercase">Media Path / URL (Opsional)</label>
+                <input
+                  type="text"
+                  value={mediaUrl}
+                  onChange={(e) => setMediaUrl(e.target.value)}
+                  placeholder="e.g. E:\AI_Automation_Website\EQUIRISE.jpeg"
                   className="w-full bg-foreground/5 border border-sidebar-border rounded-xl px-4 py-3 mt-1 focus:ring-2 focus:ring-accent/50 outline-none"
                 />
               </div>
@@ -433,14 +493,35 @@ export default function MarketingAIPage() {
         </div>
         <div className="flex space-x-4">
           <input 
+            value={scrapeUrl}
+            onChange={(e) => setScrapeUrl(e.target.value)}
             className="flex-1 bg-foreground/5 border border-sidebar-border rounded-xl px-4 py-3 focus:ring-2 focus:ring-accent/50 outline-none"
-            placeholder="Masukkan URL kampanye kompetitor (e.g. kitabisa.com/...)"
+            placeholder="Masukkan URL kampanye kompetitor (e.g. https://kitabisa.com/...)"
           />
-          <button className="bg-accent text-white px-8 rounded-xl font-bold hover:bg-accent/90 transition-all">
-            Scrape & Analyze
+          <button onClick={analyzeCompetitor} disabled={loadingScrape || !scrapeUrl} className="bg-accent text-white px-8 rounded-xl font-bold hover:bg-accent/90 transition-all disabled:opacity-50">
+            {loadingScrape ? "Scraping..." : "Scrape & Analyze"}
           </button>
         </div>
         <p className="text-xs text-foreground/40 mt-3 italic">*Fitur scraping menggunakan AI untuk mengekstrak strategi pemasaran dari URL.</p>
+
+        {scrapeOutput && (
+          <div className="mt-6 space-y-4 animate-in fade-in slide-in-from-bottom-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 bg-foreground/[0.02] border border-sidebar-border rounded-2xl">
+                <p className="text-xs font-bold text-foreground/50 uppercase mb-2">Hook</p>
+                <p className="text-sm font-bold">{scrapeOutput.hook}</p>
+              </div>
+              <div className="p-4 bg-foreground/[0.02] border border-sidebar-border rounded-2xl">
+                <p className="text-xs font-bold text-foreground/50 uppercase mb-2">Strategi</p>
+                <p className="text-sm italic">{scrapeOutput.strategy}</p>
+              </div>
+              <div className="p-4 bg-foreground/[0.02] border border-sidebar-border rounded-2xl">
+                <p className="text-xs font-bold text-foreground/50 uppercase mb-2">Kelemahan</p>
+                <p className="text-sm text-red-500/80">{scrapeOutput.weakness}</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
