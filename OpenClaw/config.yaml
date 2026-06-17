@@ -1,0 +1,5 @@
+# OpenClaw configuration enabling WhatsApp channel
+channels:
+  whatsapp:
+    enabled: true
+    # No additional config needed for basic QR connection

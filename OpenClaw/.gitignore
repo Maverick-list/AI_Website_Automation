@@ -1,0 +1,23 @@
+
+# Credentials and Tokens
+credentials.json
+token.json
+token_gmail.json
+token_*.json
+.env
+
+# WhatsApp Session Profile
+whatsapp_profile/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Diagnostic screenshots
+*.png
+
+# Logs
+*.log
+
+# Large schema files
+schema.json

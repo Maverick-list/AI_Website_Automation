@@ -1,0 +1,19 @@
+{
+  "name": "openclaw",
+  "version": "1.0.0",
+  "description": "OpenClaw adalah asisten pribadi berbasis AI yang mengintegrasikan Google Calendar, Gmail, dan WhatsApp untuk otomatisasi produktivitas harian. Proyek ini menggunakan **Gemini AI** untuk memproses bahasa alami dan **Selenium** untuk mengontrol WhatsApp Web secara otomatis.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "jimp": "^1.6.1",
+    "node-schedule": "^2.1.1"
+  }
+}
