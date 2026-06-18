@@ -21,7 +21,7 @@ async function runBroadcast() {
     if (photos.length > 1) {
         console.log(`Ditemukan ${photos.length} gambar untuk Broadcast 2. Menyatukan (stitching) gambar...`);
         try {
-            const { Jimp } = require('jimp');
+            const { Jimp } = await import('jimp');
             
             // Baca gambar
             const images = [];
