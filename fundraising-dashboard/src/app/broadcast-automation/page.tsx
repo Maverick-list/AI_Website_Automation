@@ -228,6 +228,21 @@ export default function BroadcastAutomationPage() {
                 ))}
               </select>
             </div>
+            
+            {/* OpenClaw Dashboard Button */}
+            <div className="flex items-center justify-between p-4 bg-green-500/[0.05] border border-green-500/20 rounded-2xl">
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-green-500">Kelola Perangkat & Scan QR</span>
+                <span className="text-xs text-green-500/60">Buka Dashboard Resmi untuk menambah nomor WhatsApp</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => window.open("https://mavecode-api.loca.lt/openclaw-dashboard/", "_blank")}
+                className="bg-green-500 hover:bg-green-600 text-white text-xs font-bold py-2 px-4 rounded-xl transition-all shadow-lg shadow-green-500/20"
+              >
+                Buka Dashboard
+              </button>
+            </div>
 
             <div>
               <label className="text-xs font-bold text-foreground/50 uppercase">Nomor Tujuan / ID Grup</label>

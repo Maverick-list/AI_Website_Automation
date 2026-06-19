@@ -5,6 +5,7 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const { spawn, exec } = require('child_process');
 const multer = require('multer');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
 const PORT = 5000;
@@ -12,7 +13,19 @@ const DB_FILE = path.join(__dirname, 'broadcasts.json');
 const OPENCLAW_PATH = "C:\\Users\\MAVERICK\\AppData\\Roaming\\npm\\node_modules\\openclaw\\openclaw.mjs";
 
 app.use(cors());
+
+// Proxy OpenClaw Dashboard
+app.use('/openclaw-dashboard', createProxyMiddleware({ 
+    target: 'http://127.0.0.1:18789', 
+    changeOrigin: true,
+    ws: true,
+    pathRewrite: {
+        '^/openclaw-dashboard': '/'
+    }
+}));
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Setup Multer Storage
 const storage = multer.diskStorage({
