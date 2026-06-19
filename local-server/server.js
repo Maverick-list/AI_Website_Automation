@@ -15,14 +15,22 @@ const OPENCLAW_PATH = "C:\\Users\\MAVERICK\\AppData\\Roaming\\npm\\node_modules\
 app.use(cors());
 
 // Proxy OpenClaw Dashboard
-app.use('/openclaw-dashboard', createProxyMiddleware({ 
+const openClawProxy = createProxyMiddleware({ 
     target: 'http://127.0.0.1:18789', 
     changeOrigin: true,
     ws: true,
-    pathRewrite: {
-        '^/openclaw-dashboard': '/'
+    pathRewrite: (path, req) => {
+        if (path.startsWith('/openclaw-dashboard')) {
+            return path.replace('/openclaw-dashboard', '');
+        }
+        return path;
     }
-}));
+});
+
+// Use proxy for dashboard and its API endpoints
+app.use('/openclaw-dashboard', openClawProxy);
+app.use('/v1', openClawProxy); // OpenClaw Gateway WebSocket & API
+app.use('/api/gateway', openClawProxy); // In case it uses /api/gateway
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

@@ -2,10 +2,10 @@ const localtunnel = require('localtunnel');
 
 async function startTunnel() {
   try {
-    const tunnel = await localtunnel({ port: 5000, subdomain: 'mavecode-api' });
+    const tunnel = await localtunnel({ port: 5000, subdomain: 'mavecode-api-v2' });
     console.log(`Tunnel running at: ${tunnel.url}`);
 
-    if (tunnel.url !== 'https://mavecode-api.loca.lt') {
+    if (tunnel.url !== 'https://mavecode-api-v2.loca.lt') {
         console.log("Subdomain taken or invalid. Retrying in 15 seconds...");
         tunnel.close();
         setTimeout(startTunnel, 15000);

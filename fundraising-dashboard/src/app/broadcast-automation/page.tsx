@@ -39,14 +39,14 @@ export default function BroadcastAutomationPage() {
   const fetchStatus = async () => {
     setCheckingStatus(true);
     try {
-      const res = await fetch("https://mavecode-api.loca.lt/api/status", {
+      const res = await fetch("https://mavecode-api-v2.loca.lt/api/status", {
         headers: { "Bypass-Tunnel-Reminder": "true" }
       });
       const data = await res.json();
       setIsConnected(data.connected);
       
       // Fetch Senders
-      const sendersRes = await fetch("https://mavecode-api.loca.lt/api/senders", {
+      const sendersRes = await fetch("https://mavecode-api-v2.loca.lt/api/senders", {
         headers: { "Bypass-Tunnel-Reminder": "true" }
       });
       const sendersData = await sendersRes.json();
@@ -66,7 +66,7 @@ export default function BroadcastAutomationPage() {
   const fetchBroadcasts = async () => {
     setLoadingBroadcasts(true);
     try {
-      const res = await fetch("https://mavecode-api.loca.lt/api/broadcasts", {
+      const res = await fetch("https://mavecode-api-v2.loca.lt/api/broadcasts", {
         headers: { "Bypass-Tunnel-Reminder": "true" }
       });
       const data = await res.json();
@@ -123,7 +123,7 @@ export default function BroadcastAutomationPage() {
         }
       }
 
-      const res = await fetch("https://mavecode-api.loca.lt/api/broadcasts", {
+      const res = await fetch("https://mavecode-api-v2.loca.lt/api/broadcasts", {
         method: "POST",
         headers: { 
           "Bypass-Tunnel-Reminder": "true"
@@ -153,7 +153,7 @@ export default function BroadcastAutomationPage() {
     if (!confirm("Apakah Anda yakin ingin membatalkan jadwal broadcast ini?")) return;
 
     try {
-      const res = await fetch(`https://mavecode-api.loca.lt/api/broadcasts/${id}`, {
+      const res = await fetch(`https://mavecode-api-v2.loca.lt/api/broadcasts/${id}`, {
         method: "DELETE",
         headers: { "Bypass-Tunnel-Reminder": "true" }
       });
@@ -237,7 +237,7 @@ export default function BroadcastAutomationPage() {
               </div>
               <button
                 type="button"
-                onClick={() => window.open("https://mavecode-api.loca.lt/openclaw-dashboard/", "_blank")}
+                onClick={() => window.open("https://mavecode-api-v2.loca.lt/openclaw-dashboard/", "_blank")}
                 className="bg-green-500 hover:bg-green-600 text-white text-xs font-bold py-2 px-4 rounded-xl transition-all shadow-lg shadow-green-500/20"
               >
                 Buka Dashboard
