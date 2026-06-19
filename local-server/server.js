@@ -91,7 +91,7 @@ app.get('/api/broadcasts', (req, res) => {
 
 // Create/Schedule a broadcast
 app.post('/api/broadcasts', upload.array('mediaFiles'), (req, res) => {
-    const { target, message, time, senderAccount } = req.body;
+    const { target, message, time, senderAccount, isRecurring, intervalMinutes } = req.body;
     let mediaPaths = [];
 
     if (req.files && req.files.length > 0) {
@@ -102,13 +102,16 @@ app.post('/api/broadcasts', upload.array('mediaFiles'), (req, res) => {
         return res.status(400).json({ error: "Target and message are required" });
     }
 
+    const type = isRecurring === 'true' ? "recurring" : (time ? "scheduled" : "immediate");
+    
     const newBroadcast = {
         id: uuidv4(),
         senderAccount: senderAccount || 'default',
         target,
         message,
         media: mediaPaths.length > 0 ? mediaPaths : null,
-        type: time ? "scheduled" : "immediate",
+        type: type,
+        intervalMinutes: isRecurring === 'true' ? parseInt(intervalMinutes || '5', 10) : null,
         status: time ? "pending" : "sending",
         time: time || null,
         createdAt: new Date().toISOString(),
@@ -120,7 +123,7 @@ app.post('/api/broadcasts', upload.array('mediaFiles'), (req, res) => {
     broadcasts.push(newBroadcast);
     saveBroadcasts(broadcasts);
 
-    if (!time) {
+    if (!time && type !== "recurring") {
         // Send immediately in background
         sendBroadcast(newBroadcast.id);
     }
@@ -262,27 +265,55 @@ function sendBroadcast(id) {
 // SCHEDULER
 // ----------------------------------------------------
 setInterval(() => {
-    const broadcasts = getBroadcasts();
+    let broadcasts = getBroadcasts();
     const now = new Date();
     
     let needsSave = false;
+    let broadcastsToSend = [];
 
     for (let i = 0; i < broadcasts.length; i++) {
         let b = broadcasts[i];
         if (b.status === "pending" && b.time) {
             const scheduleTime = new Date(b.time);
             if (now >= scheduleTime) {
-                console.log(`[${now.toISOString()}] Triggering scheduled broadcast ${b.id}`);
-                // Change status first to avoid multiple triggers
-                b.status = "sending";
-                needsSave = true;
-                sendBroadcast(b.id);
+                console.log(`[${now.toISOString()}] Triggering scheduled broadcast ${b.id} (${b.type})`);
+                
+                if (b.type === "recurring") {
+                    // Create child broadcast for history
+                    const childId = uuidv4();
+                    const childBroadcast = {
+                        ...b,
+                        id: childId,
+                        type: "immediate",
+                        status: "sending",
+                        time: null,
+                        intervalMinutes: null,
+                        createdAt: new Date().toISOString(),
+                        executedAt: null,
+                        error: null
+                    };
+                    broadcasts.push(childBroadcast);
+                    
+                    // Advance parent time
+                    b.time = new Date(now.getTime() + (b.intervalMinutes || 5) * 60000).toISOString();
+                    needsSave = true;
+                    broadcastsToSend.push(childId);
+                } else {
+                    b.status = "sending";
+                    needsSave = true;
+                    broadcastsToSend.push(b.id);
+                }
             }
         }
     }
 
     if (needsSave) {
         saveBroadcasts(broadcasts);
+    }
+    
+    // Call sendBroadcast AFTER saving to prevent race conditions
+    for (const id of broadcastsToSend) {
+        sendBroadcast(id);
     }
 }, 10000); // Check every 10 seconds
 

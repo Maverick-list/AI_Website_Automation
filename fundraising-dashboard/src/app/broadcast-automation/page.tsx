@@ -8,7 +8,8 @@ interface Broadcast {
   target: string;
   message: string;
   media: string[] | string | null;
-  type: "immediate" | "scheduled";
+  type: "immediate" | "scheduled" | "recurring";
+  intervalMinutes?: number;
   status: "pending" | "sending" | "sent" | "failed" | "cancelled";
   time: string | null;
   createdAt: string;
@@ -30,6 +31,8 @@ export default function BroadcastAutomationPage() {
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [isScheduled, setIsScheduled] = useState(false);
   const [scheduleTime, setScheduleTime] = useState("");
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [intervalMinutes, setIntervalMinutes] = useState(5);
   const [submitting, setSubmitting] = useState(false);
 
   // Load status and broadcasts
@@ -105,6 +108,20 @@ export default function BroadcastAutomationPage() {
       if (isScheduled && scheduleTime) {
         formData.append("time", scheduleTime);
       }
+      if (isRecurring) {
+        formData.append("isRecurring", "true");
+        formData.append("intervalMinutes", intervalMinutes.toString());
+        // Jika berulang tapi tidak diset waktu mulai, gunakan waktu saat ini
+        if (!isScheduled || !scheduleTime) {
+            const now = new Date();
+            // set to next minute to allow backend to pick it up cleanly
+            now.setMinutes(now.getMinutes() + 1);
+            // Format for datetime-local is YYYY-MM-DDThh:mm
+            const offset = now.getTimezoneOffset();
+            const localNow = new Date(now.getTime() - (offset*60*1000));
+            formData.append("time", localNow.toISOString().slice(0,16));
+        }
+      }
 
       const res = await fetch("https://mavecode-api.loca.lt/api/broadcasts", {
         method: "POST",
@@ -117,12 +134,13 @@ export default function BroadcastAutomationPage() {
       if (!res.ok || data.error) {
         throw new Error(data.error || "Gagal membuat broadcast");
       }
-      alert(isScheduled ? "Broadcast berhasil dijadwalkan!" : "Broadcast sedang dikirim di latar belakang!");
+      alert(isRecurring ? "Broadcast berulang berhasil diaktifkan!" : (isScheduled ? "Broadcast berhasil dijadwalkan!" : "Broadcast sedang dikirim di latar belakang!"));
       // Reset form (except target for quick reuse)
       setMessage("");
       setMediaFiles([]);
       setIsScheduled(false);
       setScheduleTime("");
+      setIsRecurring(false);
       fetchBroadcasts();
     } catch (err) {
       alert("Error: " + (err instanceof Error ? err.message : "Pastikan Local Server port 5000 aktif"));
@@ -288,9 +306,40 @@ export default function BroadcastAutomationPage() {
               </label>
             </div>
 
+            {/* Toggle Recurring */}
+            <div className="flex items-center justify-between p-4 bg-blue-500/[0.05] border border-blue-500/20 rounded-2xl">
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-blue-500">Kirim Berulang (Spam)</span>
+                <span className="text-xs text-blue-500/60">Pesan akan dikirim berkala tanpa henti</span>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isRecurring}
+                  onChange={(e) => setIsRecurring(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-blue-500/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+              </label>
+            </div>
+
+            {isRecurring && (
+              <div className="animate-in slide-in-from-top-2 duration-200">
+                <label className="text-xs font-bold text-blue-500 uppercase">Jeda Waktu (Menit)</label>
+                <input
+                  required={isRecurring}
+                  type="number"
+                  min="1"
+                  value={intervalMinutes}
+                  onChange={(e) => setIntervalMinutes(parseInt(e.target.value))}
+                  className="w-full bg-blue-500/5 border border-blue-500/30 rounded-xl px-4 py-3 mt-1 focus:ring-2 focus:ring-blue-500/50 outline-none"
+                />
+              </div>
+            )}
+
             {isScheduled && (
               <div className="animate-in slide-in-from-top-2 duration-200">
-                <label className="text-xs font-bold text-foreground/50 uppercase">Pilih Tanggal & Waktu</label>
+                <label className="text-xs font-bold text-foreground/50 uppercase">Pilih Tanggal & Waktu Mulai</label>
                 <input
                   required={isScheduled}
                   type="datetime-local"
@@ -309,7 +358,7 @@ export default function BroadcastAutomationPage() {
               {submitting ? (
                 <span className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
               ) : (
-                <span>{isScheduled ? "Jadwalkan Broadcast" : "Kirim Sekarang"}</span>
+                <span>{isRecurring ? "Mulai Spam Berulang" : (isScheduled ? "Jadwalkan Broadcast" : "Kirim Sekarang")}</span>
               )}
             </button>
           </form>
@@ -343,13 +392,20 @@ export default function BroadcastAutomationPage() {
                   <div key={item.id} className="p-5 border border-sidebar-border bg-foreground/[0.02] rounded-2xl flex flex-col justify-between">
                     <div>
                       <div className="flex justify-between items-start mb-2">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-accent bg-accent/10 px-2 py-0.5 rounded">
-                          Scheduled
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
+                          item.type === "recurring" ? "text-blue-500 bg-blue-500/10" : "text-accent bg-accent/10"
+                        }`}>
+                          {item.type === "recurring" ? "Recurring" : "Scheduled"}
                         </span>
                         <span className="text-xs text-foreground/40">
                           {new Date(item.time || "").toLocaleString("id-ID")}
                         </span>
                       </div>
+                      {item.type === "recurring" && (
+                        <p className="text-[10px] font-bold text-blue-500 mb-2">
+                          🔄 Berulang setiap {item.intervalMinutes} menit
+                        </p>
+                      )}
                       <p className="text-[10px] font-bold text-foreground/50 mb-1">Dari: {item.senderAccount || "default"}</p>
                       <p className="text-xs font-bold text-foreground/80 mb-1">Ke: {item.target}</p>
                       <p className="text-sm text-foreground/70 line-clamp-3 italic mb-4">"{item.message}"</p>
@@ -363,9 +419,13 @@ export default function BroadcastAutomationPage() {
                     </div>
                     <button
                       onClick={() => handleCancelBroadcast(item.id)}
-                      className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs py-2 rounded-xl font-bold transition-all"
+                      className={`w-full text-xs py-2 rounded-xl font-bold transition-all ${
+                        item.type === "recurring" 
+                          ? "bg-red-500/20 hover:bg-red-500/30 text-red-500 shadow-sm shadow-red-500/20" 
+                          : "bg-red-500/10 hover:bg-red-500/20 text-red-500"
+                      }`}
                     >
-                      Batalkan Jadwal
+                      {item.type === "recurring" ? "Hentikan Looping" : "Batalkan Jadwal"}
                     </button>
                   </div>
                 ))}
