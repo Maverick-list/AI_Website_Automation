@@ -5,6 +5,9 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const menuItems = [
+  { name: "Home", href: "/", icon: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+  ) },
   { name: "Inventory", href: "/inventory", icon: (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
   ) },
@@ -37,7 +40,7 @@ export default function Sidebar() {
       {/* Mobile Top Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-sidebar border-b border-sidebar-border z-40 flex items-center justify-between px-4">
         <h1 className="text-xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
-          FundEase
+          MaveCode AI
         </h1>
         <button 
           onClick={() => setIsOpen(!isOpen)} 
@@ -64,10 +67,10 @@ export default function Sidebar() {
         <div className="p-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
-              FundEase
+              MaveCode AI
             </h1>
             <p className="text-xs text-foreground/50 mt-1 uppercase tracking-widest font-semibold">
-              Management Console
+              Marketing Platform
             </p>
           </div>
           <button onClick={() => setIsOpen(false)} className="md:hidden text-foreground/50 hover:text-foreground">
@@ -100,12 +103,12 @@ export default function Sidebar() {
 
         <div className="p-6 border-t border-sidebar-border bg-sidebar mt-auto">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent font-bold">
-              JD
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+              MV
             </div>
             <div>
-              <p className="text-sm font-semibold">John Doe</p>
-              <p className="text-xs text-foreground/50">Admin Role</p>
+              <p className="text-sm font-semibold">MAVERICK</p>
+              <p className="text-xs text-foreground/50">Administrator</p>
             </div>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Sidebar from "@/components/Sidebar";
+import RootLayoutInner from "@/components/RootLayoutInner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FundEase | Management Dashboard",
-  description: "Modern Fundraising Management Dashboard",
+  title: "MaveCode AI | Platform Marketing AI Terlengkap",
+  description: "Platform Marketing AI terlengkap untuk bisnis Anda. WhatsApp Broadcast Otomatis, Konten AI, Manajemen Inventori & Keuangan — semua dalam satu dashboard.",
 };
 
 export default function RootLayout({
@@ -24,12 +24,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col md:flex-row`}>
-        <Sidebar />
-        <main className="flex-1 md:ml-64 p-4 md:p-8 bg-background mt-16 md:mt-0 w-full overflow-x-hidden">
+    <html lang="id">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <RootLayoutInner>
           {children}
-        </main>
+        </RootLayoutInner>
       </body>
     </html>
   );
