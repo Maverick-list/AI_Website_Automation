@@ -60,6 +60,7 @@ function initializeClient(clientId) {
         authStrategy: new LocalAuth({ clientId: clientId }),
         puppeteer: {
             headless: true,
+            executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         }
     });
@@ -90,6 +91,7 @@ function initializeClient(clientId) {
     client.on('disconnected', (reason) => {
         console.log(`Client ${clientId} was disconnected:`, reason);
         delete clients[clientId];
+        activeQrCode = null;
         
         // Auto reconnect after 5 seconds if disconnected
         setTimeout(() => {
@@ -111,6 +113,25 @@ initializeClient('default');
 
 app.get('/api/status', (req, res) => {
     res.json({ connected: true });
+});
+
+app.post('/api/wa/reconnect', async (req, res) => {
+    console.log("Manual reconnect requested for default client");
+    activeQrCode = null;
+    
+    // Destroy existing if any
+    if (clients['default']) {
+        try {
+            await clients['default'].destroy();
+        } catch (e) {
+            console.error("Error destroying client", e);
+        }
+        delete clients['default'];
+    }
+    
+    // Reinitialize
+    initializeClient('default');
+    res.json({ success: true, message: "Reconnecting..." });
 });
 
 app.get('/api/wa/add-device', (req, res) => {

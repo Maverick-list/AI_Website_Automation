@@ -112,6 +112,25 @@ export default function BroadcastAutomationPage() {
     return () => clearInterval(interval);
   }, []);
 
+  const handleReconnect = async () => {
+    setCheckingStatus(true);
+    setQrStatus("generating");
+    setQrCode(null);
+    try {
+      await fetch("https://mavecode-api-v2.loca.lt/api/wa/reconnect", {
+        method: "POST",
+        headers: { "Bypass-Tunnel-Reminder": "true" }
+      });
+      setTimeout(() => {
+        fetchStatus();
+        fetchQR();
+      }, 3000);
+    } catch (e) {
+      console.error("Failed to reconnect", e);
+      setCheckingStatus(false);
+    }
+  };
+
   const handleCreateBroadcast = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!target || !message) return alert("Nomor/Grup tujuan dan pesan wajib diisi!");
@@ -215,10 +234,10 @@ export default function BroadcastAutomationPage() {
             <p className="text-[10px] text-foreground/40 mt-0.5">Native WhatsApp Gateway</p>
           </div>
           <button
-            onClick={() => { fetchStatus(); fetchBroadcasts(); }}
+            onClick={handleReconnect}
             disabled={checkingStatus}
             className="p-2 bg-foreground/5 hover:bg-foreground/10 text-foreground rounded-xl transition-all disabled:opacity-50"
-            title="Refresh Status"
+            title="Refresh & Reconnect WhatsApp"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={checkingStatus ? "animate-spin" : ""}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M16 3h5v5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 21H3v-5"/></svg>
           </button>
