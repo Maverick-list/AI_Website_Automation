@@ -3,35 +3,16 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const { spawn, exec } = require('child_process');
+const { spawn } = require('child_process');
 const multer = require('multer');
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
+const qrcode = require('qrcode');
 
 const app = express();
 const PORT = 5000;
 const DB_FILE = path.join(__dirname, 'broadcasts.json');
-const OPENCLAW_PATH = "C:\\Users\\MAVERICK\\AppData\\Roaming\\npm\\node_modules\\openclaw\\openclaw.mjs";
 
 app.use(cors());
-
-// Proxy OpenClaw Dashboard
-const openClawProxy = createProxyMiddleware({ 
-    target: 'http://127.0.0.1:18789', 
-    changeOrigin: true,
-    ws: true,
-    pathRewrite: (path, req) => {
-        if (path.startsWith('/openclaw-dashboard')) {
-            return path.replace('/openclaw-dashboard', '');
-        }
-        return path;
-    }
-});
-
-// Use proxy for dashboard and its API endpoints
-app.use('/openclaw-dashboard', openClawProxy);
-app.use('/v1', openClawProxy); // OpenClaw Gateway WebSocket & API
-app.use('/api/gateway', openClawProxy); // In case it uses /api/gateway
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -66,51 +47,111 @@ function saveBroadcasts(data) {
 }
 
 // ----------------------------------------------------
+// WHATSAPP CLIENT MANAGER
+// ----------------------------------------------------
+const clients = {};
+let activeQrCode = null;
+
+function initializeClient(clientId) {
+    if (clients[clientId]) return clients[clientId];
+
+    console.log(`Initializing WhatsApp Client: ${clientId}`);
+    const client = new Client({
+        authStrategy: new LocalAuth({ clientId: clientId }),
+        puppeteer: {
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        }
+    });
+
+    client.on('qr', async (qr) => {
+        console.log(`QR RECEIVED for ${clientId}`);
+        try {
+            activeQrCode = await qrcode.toDataURL(qr); // Save latest QR for the frontend as Base64 Image
+        } catch (err) {
+            console.error("Failed to generate QR data URL", err);
+            activeQrCode = qr;
+        }
+    });
+
+    client.on('ready', () => {
+        console.log(`Client ${clientId} is ready!`);
+        activeQrCode = null;
+    });
+
+    client.on('authenticated', () => {
+        console.log(`Client ${clientId} authenticated successfully!`);
+    });
+
+    client.on('auth_failure', msg => {
+        console.error(`Client ${clientId} authentication failed:`, msg);
+    });
+
+    client.on('disconnected', (reason) => {
+        console.log(`Client ${clientId} was disconnected:`, reason);
+        delete clients[clientId];
+        
+        // Auto reconnect after 5 seconds if disconnected
+        setTimeout(() => {
+            initializeClient(clientId);
+        }, 5000);
+    });
+
+    client.initialize();
+    clients[clientId] = client;
+    return client;
+}
+
+// Initialize default client on startup
+initializeClient('default');
+
+// ----------------------------------------------------
 // API ENDPOINTS
 // ----------------------------------------------------
 
-// Status Check
 app.get('/api/status', (req, res) => {
     res.json({ connected: true });
 });
 
-// Get available senders
-app.get('/api/senders', (req, res) => {
-    exec(`node "${OPENCLAW_PATH}" channels status --json`, (error, stdout, stderr) => {
-        if (error) {
-            console.error("Failed to fetch senders:", error);
-            return res.status(500).json({ error: "Failed to fetch senders" });
+app.get('/api/wa/add-device', (req, res) => {
+    // Returns the current QR code if not authenticated
+    if (activeQrCode) {
+        return res.json({ qr: activeQrCode, status: "pending_scan" });
+    } else {
+        const client = clients['default'];
+        if (client && client.info) {
+            return res.json({ status: "connected", wid: client.info.wid._serialized, name: client.info.pushname });
         }
-        try {
-            const data = JSON.parse(stdout);
-            const whatsappAccounts = data?.channelAccounts?.whatsapp || [];
-            
-            // Map to array of { id, phone }
-            const senders = whatsappAccounts.map(acc => {
-                // To get phone number safely, we just use accountId as label if we can't find phone easily
-                // or just rely on accountId
-                return {
-                    id: acc.accountId,
-                    label: acc.accountId === 'default' ? 'Default Sender' : acc.accountId
-                };
-            });
-            res.json(senders);
-        } catch (e) {
-            console.error("Failed to parse senders JSON:", e);
-            res.status(500).json({ error: "Invalid JSON from OpenClaw" });
-        }
-    });
+        return res.json({ status: "generating", message: "Sedang menyiapkan QR Code, silakan coba beberapa detik lagi..." });
+    }
 });
 
-// Get all broadcasts
+app.get('/api/senders', (req, res) => {
+    // List all connected clients
+    const senders = [];
+    for (const [id, client] of Object.entries(clients)) {
+        if (client.info) {
+            senders.push({
+                id: id,
+                label: `WhatsApp ${client.info.pushname || client.info.wid.user}`
+            });
+        }
+    }
+    
+    // If no client is connected yet, but we are trying to connect default
+    if (senders.length === 0) {
+        senders.push({ id: 'default', label: 'Default (Not Connected)' });
+    }
+    
+    res.json(senders);
+});
+
 app.get('/api/broadcasts', (req, res) => {
     const broadcasts = getBroadcasts();
-    // Sort by created at descending
     broadcasts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     res.json(broadcasts);
 });
 
-// Create/Schedule a broadcast
 app.post('/api/broadcasts', upload.array('mediaFiles'), (req, res) => {
     const { target, message, time, senderAccount, isRecurring, intervalMinutes } = req.body;
     let mediaPaths = [];
@@ -145,14 +186,12 @@ app.post('/api/broadcasts', upload.array('mediaFiles'), (req, res) => {
     saveBroadcasts(broadcasts);
 
     if (!time && type !== "recurring") {
-        // Send immediately in background
         sendBroadcast(newBroadcast.id);
     }
 
     res.status(201).json(newBroadcast);
 });
 
-// Cancel scheduled broadcast
 app.delete('/api/broadcasts/:id', (req, res) => {
     const { id } = req.params;
     let broadcasts = getBroadcasts();
@@ -175,7 +214,7 @@ app.delete('/api/broadcasts/:id', (req, res) => {
 // BROADCAST EXECUTION LOGIC
 // ----------------------------------------------------
 
-function sendBroadcast(id) {
+async function sendBroadcast(id) {
     let broadcasts = getBroadcasts();
     let index = broadcasts.findIndex(b => b.id === id);
     if (index === -1) return;
@@ -186,100 +225,65 @@ function sendBroadcast(id) {
 
     console.log(`[${new Date().toISOString()}] Sending Broadcast ID: ${id} to ${b.target}`);
 
-    const mediaList = Array.isArray(b.media) ? b.media : (b.media ? [b.media] : []);
-
-    const executeOpenClaw = (mediaItem, msgText, callback) => {
-        let args = [
-            OPENCLAW_PATH,
-            'message', 'send',
-            '--target', b.target
-        ];
-
-        if (b.senderAccount && b.senderAccount !== 'default') {
-            args.push('--account', b.senderAccount);
+    try {
+        const client = clients[b.senderAccount] || clients['default'];
+        if (!client || !client.info) {
+            throw new Error(`WhatsApp client ${b.senderAccount} is not connected!`);
         }
 
-        if (msgText) {
-            args.push('--message', msgText);
+        // Clean target number (remove non-digits and append @c.us if it's a direct number)
+        let chatId = b.target;
+        if (!chatId.endsWith('@g.us') && !chatId.endsWith('@c.us')) {
+            chatId = chatId.replace(/\D/g, '') + '@c.us';
         }
 
-        if (mediaItem) {
-            args.push('--media', mediaItem);
-        }
-
-        const process = spawn('node', args);
-        let stdoutData = "";
-        let stderrData = "";
-
-        process.stdout.on('data', (data) => {
-            stdoutData += data.toString();
-            console.log(`[STDOUT] ${data.toString().trim()}`);
-        });
-
-        process.stderr.on('data', (data) => {
-            stderrData += data.toString();
-            console.error(`[STDERR] ${data.toString().trim()}`);
-        });
-
-        process.on('close', (code) => {
-            callback(code, stdoutData, stderrData);
-        });
-    };
-
-    // Recursive function to send multiple media files sequentially
-    const sendSequentially = (index) => {
-        if (index === 0 && mediaList.length === 0) {
-            // No media, just send text
-            executeOpenClaw(null, b.message, finishBroadcast);
-            return;
-        }
-
-        if (index >= mediaList.length) {
-            finishBroadcast(0, "All media sent", "");
-            return;
-        }
-
-        // Send the text message only with the first media item
-        const msgText = index === 0 ? b.message : "";
+        const mediaList = Array.isArray(b.media) ? b.media : (b.media ? [b.media] : []);
         
-        executeOpenClaw(mediaList[index], msgText, (code, stdout, stderr) => {
-            if (code !== 0) {
-                // If one fails, fail the whole broadcast
-                finishBroadcast(code, stdout, stderr);
-            } else {
-                // Wait 2 seconds before sending the next one to avoid rate limits
-                setTimeout(() => sendSequentially(index + 1), 2000);
+        if (mediaList.length === 0) {
+            await client.sendMessage(chatId, b.message);
+        } else {
+            for (let i = 0; i < mediaList.length; i++) {
+                const mediaPath = mediaList[i];
+                const media = MessageMedia.fromFilePath(mediaPath);
+                
+                // Only attach text message to the first media
+                if (i === 0) {
+                    await client.sendMessage(chatId, media, { caption: b.message });
+                } else {
+                    await client.sendMessage(chatId, media);
+                }
+                
+                // Small delay between sending multiple files
+                if (i < mediaList.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
             }
-        });
-    };
+        }
 
-    const finishBroadcast = (code, stdoutData, stderrData) => {
+        // Success
         broadcasts = getBroadcasts();
         index = broadcasts.findIndex(x => x.id === id);
-        if (index === -1) return;
-
         b = broadcasts[index];
+        
+        b.status = "sent";
         b.executedAt = new Date().toISOString();
-
-        if (code === 0) {
-            b.status = "sent";
-            console.log(`[${new Date().toISOString()}] Broadcast ${id} successfully sent!`);
-            
-            // Play success chime (Windows specific)
-            const chimeArgs = ['-Command', "(New-Object System.Media.SoundPlayer 'C:\\Windows\\Media\\Windows Notify.wav').PlaySync()"];
-            spawn('powershell', chimeArgs, { detached: true });
-
-        } else {
-            b.status = "failed";
-            b.error = stderrData || stdoutData || `Failed with exit code ${code}`;
-            console.error(`[${new Date().toISOString()}] Broadcast ${id} failed: ${b.error}`);
-        }
-
         saveBroadcasts(broadcasts);
-    };
+        console.log(`[${new Date().toISOString()}] Broadcast ${id} successfully sent!`);
+        
+        const chimeArgs = ['-Command', "(New-Object System.Media.SoundPlayer 'C:\\Windows\\Media\\Windows Notify.wav').PlaySync()"];
+        spawn('powershell', chimeArgs, { detached: true });
 
-    // Start sending
-    sendSequentially(0);
+    } catch (error) {
+        broadcasts = getBroadcasts();
+        index = broadcasts.findIndex(x => x.id === id);
+        b = broadcasts[index];
+        
+        b.status = "failed";
+        b.error = error.message;
+        b.executedAt = new Date().toISOString();
+        saveBroadcasts(broadcasts);
+        console.error(`[${new Date().toISOString()}] Broadcast ${id} failed: ${b.error}`);
+    }
 }
 
 // ----------------------------------------------------
@@ -300,7 +304,6 @@ setInterval(() => {
                 console.log(`[${now.toISOString()}] Triggering scheduled broadcast ${b.id} (${b.type})`);
                 
                 if (b.type === "recurring") {
-                    // Create child broadcast for history
                     const childId = uuidv4();
                     const childBroadcast = {
                         ...b,
@@ -315,7 +318,6 @@ setInterval(() => {
                     };
                     broadcasts.push(childBroadcast);
                     
-                    // Advance parent time
                     b.time = new Date(now.getTime() + (b.intervalMinutes || 5) * 60000).toISOString();
                     needsSave = true;
                     broadcastsToSend.push(childId);
@@ -332,15 +334,14 @@ setInterval(() => {
         saveBroadcasts(broadcasts);
     }
     
-    // Call sendBroadcast AFTER saving to prevent race conditions
     for (const id of broadcastsToSend) {
         sendBroadcast(id);
     }
-}, 10000); // Check every 10 seconds
+}, 10000);
 
 app.listen(PORT, () => {
     console.log(`=============================================`);
-    console.log(`  WhatsApp Local Broadcast API Server`);
+    console.log(`  WhatsApp Web JS API Server (Native QR)`);
     console.log(`  Listening on http://localhost:${PORT}`);
     console.log(`=============================================`);
 });

@@ -23,6 +23,10 @@ export default function BroadcastAutomationPage() {
   const [checkingStatus, setCheckingStatus] = useState(false);
   const [loadingBroadcasts, setLoadingBroadcasts] = useState(false);
   const [senders, setSenders] = useState<{id: string, label: string}[]>([]);
+  
+  // QR Code State
+  const [qrCode, setQrCode] = useState<string | null>(null);
+  const [qrStatus, setQrStatus] = useState<string>("generating");
 
   // Form State
   const [senderAccount, setSenderAccount] = useState("default");
@@ -78,13 +82,32 @@ export default function BroadcastAutomationPage() {
     }
   };
 
+  const fetchQR = async () => {
+    try {
+      const res = await fetch("https://mavecode-api-v2.loca.lt/api/wa/add-device", {
+        headers: { "Bypass-Tunnel-Reminder": "true" }
+      });
+      const data = await res.json();
+      setQrStatus(data.status);
+      if (data.qr) {
+        setQrCode(data.qr);
+      } else {
+        setQrCode(null);
+      }
+    } catch (e) {
+      console.error("Failed to load QR code:", e);
+    }
+  };
+
   useEffect(() => {
     fetchStatus();
     fetchBroadcasts();
+    fetchQR();
     // Poll every 15 seconds to keep dashboard fresh
     const interval = setInterval(() => {
       fetchStatus();
       fetchBroadcasts();
+      fetchQR();
     }, 15000);
     return () => clearInterval(interval);
   }, []);
@@ -189,7 +212,7 @@ export default function BroadcastAutomationPage() {
                 {isConnected === true ? "WhatsApp Connected" : isConnected === false ? "WhatsApp Disconnected" : "Checking Status..."}
               </span>
             </div>
-            <p className="text-[10px] text-foreground/40 mt-0.5">OpenClaw Local Gateway</p>
+            <p className="text-[10px] text-foreground/40 mt-0.5">Native WhatsApp Gateway</p>
           </div>
           <button
             onClick={() => { fetchStatus(); fetchBroadcasts(); }}
@@ -229,19 +252,34 @@ export default function BroadcastAutomationPage() {
               </select>
             </div>
             
-            {/* OpenClaw Dashboard Button */}
-            <div className="flex items-center justify-between p-4 bg-green-500/[0.05] border border-green-500/20 rounded-2xl">
-              <div className="flex flex-col">
-                <span className="text-sm font-bold text-green-500">Kelola Perangkat & Scan QR</span>
-                <span className="text-xs text-green-500/60">Buka Dashboard Resmi untuk menambah nomor WhatsApp</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => window.open("https://mavecode-api-v2.loca.lt/openclaw-dashboard/", "_blank")}
-                className="bg-green-500 hover:bg-green-600 text-white text-xs font-bold py-2 px-4 rounded-xl transition-all shadow-lg shadow-green-500/20"
-              >
-                Buka Dashboard
-              </button>
+            {/* WhatsApp Connection Status & QR */}
+            <div className="flex flex-col p-6 bg-foreground/5 border border-sidebar-border rounded-2xl items-center text-center space-y-4 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-green-600"></div>
+              <h3 className="font-bold text-lg">Hubungkan Perangkat Baru</h3>
+              
+              {qrStatus === "connected" ? (
+                <div className="flex flex-col items-center text-green-500 space-y-2">
+                  <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  </div>
+                  <p className="font-bold">WhatsApp Terhubung!</p>
+                  <p className="text-xs text-foreground/50">Sistem siap digunakan untuk mengirim pesan otomatis.</p>
+                </div>
+              ) : qrCode ? (
+                <div className="flex flex-col items-center space-y-3">
+                  <p className="text-sm text-foreground/70">Buka WhatsApp di HP Anda, tap menu (⋮), pilih Tautkan Perangkat, lalu scan QR Code di bawah:</p>
+                  <div className="bg-white p-2 rounded-xl shadow-lg border border-white/10">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={qrCode} alt="WhatsApp QR Code" className="w-48 h-48" />
+                  </div>
+                  <p className="text-xs text-yellow-500 font-medium animate-pulse">Menunggu pindaian...</p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="w-12 h-12 border-4 border-foreground/10 border-t-green-500 rounded-full animate-spin"></div>
+                  <p className="text-sm text-foreground/70">{qrStatus === "generating" ? "Sedang menyiapkan QR Code, mohon tunggu..." : "Memuat status..."}</p>
+                </div>
+              )}
             </div>
 
             <div>
