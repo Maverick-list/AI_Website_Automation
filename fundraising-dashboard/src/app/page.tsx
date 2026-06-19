@@ -21,8 +21,37 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans overflow-x-hidden selection:bg-[#00B074] selection:text-white">
       
+      {/* HEADER / NAVBAR */}
+      <header className="absolute top-0 left-0 right-0 z-50 px-6 lg:px-20 max-w-7xl mx-auto py-6 flex items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 text-[#00B074] font-bold text-xl tracking-tight">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+          JobFine
+        </Link>
+
+        {/* Desktop Nav Links */}
+        <nav className="hidden lg:flex items-center gap-8 text-sm font-bold text-gray-700">
+          <Link href="#" className="hover:text-[#00B074] transition-colors">Platform</Link>
+          <Link href="#" className="hover:text-[#00B074] transition-colors">Solution</Link>
+          <Link href="#" className="hover:text-[#00B074] transition-colors">Resources</Link>
+          <Link href="#" className="hover:text-[#00B074] transition-colors">Company</Link>
+        </nav>
+
+        {/* CTA Button */}
+        <div className="hidden lg:block">
+          <Link href="/login" className="bg-[#00B074] hover:bg-[#009b65] text-white px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg shadow-[#00B074]/30">
+            Book A Demo
+          </Link>
+        </div>
+
+        {/* Mobile Menu Button */}
+        <button className="lg:hidden text-gray-800">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        </button>
+      </header>
+
       {/* 1. HERO SECTION */}
-      <section className="relative pt-24 pb-20 lg:pt-32 lg:pb-28 px-6 lg:px-20 max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12">
+      <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-28 px-6 lg:px-20 max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12">
         {/* Decorative Grid Background for Hero */}
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-40 z-0 pointer-events-none"></div>
         
@@ -33,13 +62,13 @@ export default function LandingPage() {
           transition={{ duration: 0.8 }}
           className="w-full lg:w-[45%] relative z-10"
         >
-          <div className="flex items-center gap-2 mb-6 text-[#00B074] font-bold text-xl tracking-tight">
+          <div className="flex items-center gap-2 mb-6 text-[#00B074] font-bold text-xl tracking-tight hidden">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
-            MaveCode AI
+            JobFine
           </div>
           <h1 className="text-5xl lg:text-7xl font-extrabold leading-[1.1] text-gray-900 mb-6 tracking-tight">
-            Automate Your <br/>
-            Ideal Business
+            Find Your <br/>
+            Ideal Job
           </h1>
           <p className="text-gray-500 text-lg mb-10 max-w-md leading-relaxed">
             The digital marketing and automation solution provider for global scale retailers turned to the AI revolution.
@@ -548,9 +577,9 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-20 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2 text-[#00B074] font-bold text-xl tracking-tight">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
-            MaveCode AI
+            JobFine
           </div>
-          <p className="text-sm text-gray-400">© 2026 MaveCode AI Automation. All rights reserved.</p>
+          <p className="text-sm text-gray-400">© 2026 JobFine. All rights reserved.</p>
           <div className="flex gap-4">
             <a href="#" className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-[#00B074] hover:bg-green-50 transition-colors">
               <InstagramIcon size={18} />
