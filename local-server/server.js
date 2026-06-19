@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const { spawn } = require('child_process');
+const multer = require('multer');
 
 const app = express();
 const PORT = 5000;
@@ -12,6 +13,18 @@ const OPENCLAW_PATH = "C:\\Users\\MAVERICK\\AppData\\Roaming\\npm\\node_modules\
 
 app.use(cors());
 app.use(express.json());
+
+// Setup Multer Storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, 'uploads'));
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    cb(null, uuidv4() + ext);
+  }
+});
+const upload = multer({ storage: storage });
 
 // Initialize DB
 if (!fs.existsSync(DB_FILE)) {
@@ -50,8 +63,13 @@ app.get('/api/broadcasts', (req, res) => {
 });
 
 // Create/Schedule a broadcast
-app.post('/api/broadcasts', (req, res) => {
-    const { target, message, media, time } = req.body;
+app.post('/api/broadcasts', upload.single('mediaFile'), (req, res) => {
+    const { target, message, time } = req.body;
+    let mediaPath = null;
+
+    if (req.file) {
+        mediaPath = req.file.path;
+    }
 
     if (!target || !message) {
         return res.status(400).json({ error: "Target and message are required" });
@@ -61,7 +79,7 @@ app.post('/api/broadcasts', (req, res) => {
         id: uuidv4(),
         target,
         message,
-        media: media || null,
+        media: mediaPath,
         type: time ? "scheduled" : "immediate",
         status: time ? "pending" : "sending",
         time: time || null,

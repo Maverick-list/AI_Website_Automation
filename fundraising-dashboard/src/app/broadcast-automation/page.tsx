@@ -24,7 +24,7 @@ export default function BroadcastAutomationPage() {
   // Form State
   const [target, setTarget] = useState("120363401263735503@g.us");
   const [message, setMessage] = useState("");
-  const [media, setMedia] = useState("");
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [isScheduled, setIsScheduled] = useState(false);
   const [scheduleTime, setScheduleTime] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -78,18 +78,22 @@ export default function BroadcastAutomationPage() {
 
     setSubmitting(true);
     try {
+      const formData = new FormData();
+      formData.append("target", target);
+      formData.append("message", message);
+      if (mediaFile) {
+        formData.append("mediaFile", mediaFile);
+      }
+      if (isScheduled && scheduleTime) {
+        formData.append("time", scheduleTime);
+      }
+
       const res = await fetch("https://mavecode-api.loca.lt/api/broadcasts", {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
           "Bypass-Tunnel-Reminder": "true"
         },
-        body: JSON.stringify({
-          target,
-          message,
-          media: media || undefined,
-          time: isScheduled ? scheduleTime : undefined,
-        }),
+        body: formData,
       });
       const data = await res.json();
       if (!res.ok || data.error) {
@@ -98,7 +102,7 @@ export default function BroadcastAutomationPage() {
       alert(isScheduled ? "Broadcast berhasil dijadwalkan!" : "Broadcast sedang dikirim di latar belakang!");
       // Reset form (except target for quick reuse)
       setMessage("");
-      setMedia("");
+      setMediaFile(null);
       setIsScheduled(false);
       setScheduleTime("");
       fetchBroadcasts();
@@ -200,14 +204,34 @@ export default function BroadcastAutomationPage() {
             </div>
 
             <div>
-              <label className="text-xs font-bold text-foreground/50 uppercase">Path Gambar / Media (Opsional)</label>
-              <input
-                type="text"
-                value={media}
-                onChange={(e) => setMedia(e.target.value)}
-                placeholder="e.g. E:\AI_Automation_Website\EQUIRISE.jpeg"
-                className="w-full bg-foreground/5 border border-sidebar-border rounded-xl px-4 py-3 mt-1 focus:ring-2 focus:ring-accent/50 outline-none"
-              />
+              <label className="text-xs font-bold text-foreground/50 uppercase">Gambar / Media (Opsional)</label>
+              <div className="mt-1 flex items-center justify-center w-full">
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-sidebar-border rounded-xl cursor-pointer bg-foreground/5 hover:bg-foreground/10 transition-colors">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <svg className="w-8 h-8 mb-3 text-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                    <p className="mb-2 text-sm text-foreground/70"><span className="font-semibold">Klik untuk upload</span> atau drag and drop</p>
+                    <p className="text-xs text-foreground/50">{mediaFile ? mediaFile.name : "PNG, JPG, MP4"}</p>
+                  </div>
+                  <input 
+                    type="file" 
+                    className="hidden" 
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setMediaFile(e.target.files[0]);
+                      }
+                    }} 
+                  />
+                </label>
+              </div>
+              {mediaFile && (
+                <button 
+                  type="button" 
+                  onClick={() => setMediaFile(null)}
+                  className="text-xs text-red-500 mt-2 font-bold hover:underline"
+                >
+                  Hapus Pilihan
+                </button>
+              )}
             </div>
 
             {/* Toggle Schedule */}
