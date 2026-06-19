@@ -10,5 +10,77 @@
     "createdAt": "2026-06-19T09:00:54.721Z",
     "executedAt": "2026-06-19T09:00:57.156Z",
     "error": "Too many arguments for this command.\nTry: openclaw message send --help\n"
+  },
+  {
+    "id": "904486df-06f2-4927-8560-eb64661f8469",
+    "target": "+6285191769521",
+    "message": "Halo aku mau kirim pesan",
+    "media": null,
+    "type": "immediate",
+    "status": "failed",
+    "time": null,
+    "createdAt": "2026-06-19T09:17:50.901Z",
+    "executedAt": "2026-06-19T09:17:53.302Z",
+    "error": "Too many arguments for this command.\nTry: openclaw message send --help\n"
+  },
+  {
+    "id": "fe093eac-9445-4bb2-9699-f121c4ccbe3c",
+    "target": "+6285191769521",
+    "message": "Halo aku ingin kirim pesan",
+    "media": null,
+    "type": "immediate",
+    "status": "sent",
+    "time": null,
+    "createdAt": "2026-06-19T09:26:23.308Z",
+    "executedAt": "2026-06-19T09:26:33.863Z",
+    "error": null
+  },
+  {
+    "id": "f665fef6-c1be-4049-bc59-5e6ac4f9f165",
+    "target": "+6281260671058",
+    "message": "Halo aku ingin kirim pesan",
+    "media": null,
+    "type": "immediate",
+    "status": "sent",
+    "time": null,
+    "createdAt": "2026-06-19T09:27:30.034Z",
+    "executedAt": "2026-06-19T09:27:40.655Z",
+    "error": null
+  },
+  {
+    "id": "fc756d3d-ea4d-431a-82fe-83c7dcb83a51",
+    "target": "+6289504919474",
+    "message": "Halo, ini pesan dari FundRaising AI",
+    "media": null,
+    "type": "immediate",
+    "status": "sent",
+    "time": null,
+    "createdAt": "2026-06-19T09:28:50.344Z",
+    "executedAt": "2026-06-19T09:29:02.609Z",
+    "error": null
+  },
+  {
+    "id": "d964339b-ca8a-431d-a4e4-b9e5ddb7d407",
+    "target": "+6289504919474",
+    "message": "Halo, ini pesan kedua dari FundRaising AI",
+    "media": null,
+    "type": "scheduled",
+    "status": "sent",
+    "time": "2026-06-19T16:31",
+    "createdAt": "2026-06-19T09:30:06.256Z",
+    "executedAt": "2026-06-19T09:31:16.264Z",
+    "error": null
+  },
+  {
+    "id": "6e45e53e-9ddb-45f4-9314-c314ecc75e26",
+    "target": "120363403718315947@g.us",
+    "message": "Halo, ini pesan dari AI",
+    "media": null,
+    "type": "scheduled",
+    "status": "sent",
+    "time": "2026-06-19T16:33",
+    "createdAt": "2026-06-19T09:32:30.625Z",
+    "executedAt": "2026-06-19T09:33:18.153Z",
+    "error": null
   }
 ]

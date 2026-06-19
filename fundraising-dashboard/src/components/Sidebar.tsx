@@ -29,51 +29,86 @@ const menuItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <aside className="w-64 bg-sidebar border-r border-sidebar-border h-screen flex flex-col fixed left-0 top-0 z-50">
-      <div className="p-6">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+    <>
+      {/* Mobile Top Header */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-sidebar border-b border-sidebar-border z-40 flex items-center justify-between px-4">
+        <h1 className="text-xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
           FundEase
         </h1>
-        <p className="text-xs text-foreground/50 mt-1 uppercase tracking-widest font-semibold">
-          Management Console
-        </p>
+        <button 
+          onClick={() => setIsOpen(!isOpen)} 
+          className="p-2 text-foreground/70 hover:text-foreground transition-colors"
+        >
+          {isOpen ? (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+          )}
+        </button>
       </div>
 
-      <nav className="flex-1 px-4 py-4 space-y-2">
-        {menuItems.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                isActive
-                  ? "bg-accent text-white shadow-lg shadow-accent/20"
-                  : "hover:bg-foreground/5 text-foreground/70 hover:text-foreground"
-              }`}
-            >
-              <span className={`${isActive ? "text-white" : "text-accent group-hover:scale-110 transition-transform"}`}>
-                {item.icon}
-              </span>
-              <span className="font-medium">{item.name}</span>
-            </Link>
-          );
-        })}
-      </nav>
+      {/* Mobile Backdrop */}
+      {isOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-sm transition-opacity"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
 
-      <div className="p-6 border-t border-sidebar-border">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent font-bold">
-            JD
-          </div>
+      {/* Sidebar Content */}
+      <aside className={`w-64 bg-sidebar border-r border-sidebar-border h-screen flex flex-col fixed left-0 top-0 z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}>
+        <div className="p-6 flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold">John Doe</p>
-            <p className="text-xs text-foreground/50">Admin Role</p>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+              FundEase
+            </h1>
+            <p className="text-xs text-foreground/50 mt-1 uppercase tracking-widest font-semibold">
+              Management Console
+            </p>
+          </div>
+          <button onClick={() => setIsOpen(false)} className="md:hidden text-foreground/50 hover:text-foreground">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+
+        <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
+          {menuItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                onClick={() => setIsOpen(false)}
+                className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+                  isActive
+                    ? "bg-accent text-white shadow-lg shadow-accent/20"
+                    : "hover:bg-foreground/5 text-foreground/70 hover:text-foreground"
+                }`}
+              >
+                <span className={`${isActive ? "text-white" : "text-accent group-hover:scale-110 transition-transform"}`}>
+                  {item.icon}
+                </span>
+                <span className="font-medium">{item.name}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="p-6 border-t border-sidebar-border bg-sidebar mt-auto">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent font-bold">
+              JD
+            </div>
+            <div>
+              <p className="text-sm font-semibold">John Doe</p>
+              <p className="text-xs text-foreground/50">Admin Role</p>
+            </div>
           </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }
