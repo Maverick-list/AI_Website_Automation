@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 
 interface Broadcast {
   id: string;
+  senderAccount?: string;
   target: string;
   message: string;
   media: string[] | string | null;
@@ -20,8 +21,10 @@ export default function BroadcastAutomationPage() {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
   const [checkingStatus, setCheckingStatus] = useState(false);
   const [loadingBroadcasts, setLoadingBroadcasts] = useState(false);
+  const [senders, setSenders] = useState<{id: string, label: string}[]>([]);
 
   // Form State
+  const [senderAccount, setSenderAccount] = useState("default");
   const [target, setTarget] = useState("120363401263735503@g.us");
   const [message, setMessage] = useState("");
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
@@ -38,6 +41,18 @@ export default function BroadcastAutomationPage() {
       });
       const data = await res.json();
       setIsConnected(data.connected);
+      
+      // Fetch Senders
+      const sendersRes = await fetch("https://mavecode-api.loca.lt/api/senders", {
+        headers: { "Bypass-Tunnel-Reminder": "true" }
+      });
+      const sendersData = await sendersRes.json();
+      if (Array.isArray(sendersData)) {
+        setSenders(sendersData);
+        if (sendersData.length > 0 && !sendersData.find(s => s.id === senderAccount)) {
+          setSenderAccount(sendersData[0].id);
+        }
+      }
     } catch (e) {
       setIsConnected(false);
     } finally {
@@ -79,6 +94,7 @@ export default function BroadcastAutomationPage() {
     setSubmitting(true);
     try {
       const formData = new FormData();
+      formData.append("senderAccount", senderAccount);
       formData.append("target", target);
       formData.append("message", message);
       if (mediaFiles && mediaFiles.length > 0) {
@@ -181,6 +197,20 @@ export default function BroadcastAutomationPage() {
           </div>
 
           <form onSubmit={handleCreateBroadcast} className="space-y-6">
+            <div>
+              <label className="text-xs font-bold text-foreground/50 uppercase">Pilih Pengirim</label>
+              <select
+                value={senderAccount}
+                onChange={(e) => setSenderAccount(e.target.value)}
+                className="w-full bg-foreground/5 border border-sidebar-border rounded-xl px-4 py-3 mt-1 focus:ring-2 focus:ring-accent/50 outline-none appearance-none"
+              >
+                {senders.length === 0 && <option value="default">Default Sender</option>}
+                {senders.map(s => (
+                  <option key={s.id} value={s.id}>{s.label}</option>
+                ))}
+              </select>
+            </div>
+
             <div>
               <label className="text-xs font-bold text-foreground/50 uppercase">Nomor Tujuan / ID Grup</label>
               <input
@@ -320,6 +350,7 @@ export default function BroadcastAutomationPage() {
                           {new Date(item.time || "").toLocaleString("id-ID")}
                         </span>
                       </div>
+                      <p className="text-[10px] font-bold text-foreground/50 mb-1">Dari: {item.senderAccount || "default"}</p>
                       <p className="text-xs font-bold text-foreground/80 mb-1">Ke: {item.target}</p>
                       <p className="text-sm text-foreground/70 line-clamp-3 italic mb-4">"{item.message}"</p>
                       {item.media && (
@@ -367,6 +398,7 @@ export default function BroadcastAutomationPage() {
                     <tr className="border-b border-sidebar-border text-foreground/40 text-xs font-bold uppercase">
                       <th className="pb-3">Waktu dibuat</th>
                       <th className="pb-3">Tipe</th>
+                      <th className="pb-3">Dari (Pengirim)</th>
                       <th className="pb-3">Tujuan</th>
                       <th className="pb-3">Pesan</th>
                       <th className="pb-3 text-right">Status</th>
@@ -380,6 +412,9 @@ export default function BroadcastAutomationPage() {
                         </td>
                         <td className="py-4 text-xs font-bold uppercase">
                           {item.type}
+                        </td>
+                        <td className="py-4 text-xs font-bold text-foreground/80 max-w-[120px] truncate">
+                          {item.senderAccount || "default"}
                         </td>
                         <td className="py-4 text-xs font-bold text-foreground/80 max-w-[120px] truncate">
                           {item.target}

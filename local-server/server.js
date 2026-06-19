@@ -3,7 +3,7 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const { spawn } = require('child_process');
+const { spawn, exec } = require('child_process');
 const multer = require('multer');
 
 const app = express();
@@ -50,8 +50,35 @@ function saveBroadcasts(data) {
 
 // Status Check
 app.get('/api/status', (req, res) => {
-    // Ideally we would ping openclaw, but simply returning true is enough for UI
     res.json({ connected: true });
+});
+
+// Get available senders
+app.get('/api/senders', (req, res) => {
+    exec(`node "${OPENCLAW_PATH}" channels status --json`, (error, stdout, stderr) => {
+        if (error) {
+            console.error("Failed to fetch senders:", error);
+            return res.status(500).json({ error: "Failed to fetch senders" });
+        }
+        try {
+            const data = JSON.parse(stdout);
+            const whatsappAccounts = data?.channelAccounts?.whatsapp || [];
+            
+            // Map to array of { id, phone }
+            const senders = whatsappAccounts.map(acc => {
+                // To get phone number safely, we just use accountId as label if we can't find phone easily
+                // or just rely on accountId
+                return {
+                    id: acc.accountId,
+                    label: acc.accountId === 'default' ? 'Default Sender' : acc.accountId
+                };
+            });
+            res.json(senders);
+        } catch (e) {
+            console.error("Failed to parse senders JSON:", e);
+            res.status(500).json({ error: "Invalid JSON from OpenClaw" });
+        }
+    });
 });
 
 // Get all broadcasts
@@ -64,7 +91,7 @@ app.get('/api/broadcasts', (req, res) => {
 
 // Create/Schedule a broadcast
 app.post('/api/broadcasts', upload.array('mediaFiles'), (req, res) => {
-    const { target, message, time } = req.body;
+    const { target, message, time, senderAccount } = req.body;
     let mediaPaths = [];
 
     if (req.files && req.files.length > 0) {
@@ -77,6 +104,7 @@ app.post('/api/broadcasts', upload.array('mediaFiles'), (req, res) => {
 
     const newBroadcast = {
         id: uuidv4(),
+        senderAccount: senderAccount || 'default',
         target,
         message,
         media: mediaPaths.length > 0 ? mediaPaths : null,
@@ -142,6 +170,10 @@ function sendBroadcast(id) {
             'message', 'send',
             '--target', b.target
         ];
+
+        if (b.senderAccount && b.senderAccount !== 'default') {
+            args.push('--account', b.senderAccount);
+        }
 
         if (msgText) {
             args.push('--message', msgText);
