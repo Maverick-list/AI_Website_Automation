@@ -109,7 +109,7 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile Top Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-sidebar border-b border-sidebar-border z-40 flex items-center justify-between px-4">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-black/60 backdrop-blur-2xl border-b border-white/10 z-40 flex items-center justify-between px-4">
         <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
           Wablas Gateway
         </h1>
@@ -130,7 +130,7 @@ export default function Sidebar() {
       )}
 
       {/* Sidebar Content */}
-      <aside className={`w-64 bg-sidebar border-r border-sidebar-border h-screen flex flex-col fixed left-0 top-0 z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 custom-scrollbar`}>
+      <aside className={`w-64 bg-black/40 backdrop-blur-3xl border-r border-white/10 h-screen flex flex-col fixed left-0 top-0 z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 custom-scrollbar`}>
         <div className="p-6 flex items-center justify-between">
           <Link href="/">
             <div>
@@ -158,8 +158,8 @@ export default function Sidebar() {
                 {hasSubmenu ? (
                   <button
                     onClick={() => toggleSubmenu(item.name)}
-                    className={`flex items-center justify-between px-4 py-2.5 rounded-lg transition-all duration-200 group text-sm font-medium ${
-                      isExpanded ? "text-cyan-400 bg-cyan-400/10" : "text-foreground/70 hover:text-foreground hover:bg-foreground/5"
+                    className={`flex items-center justify-between px-4 py-2.5 rounded-xl transition-all duration-200 group text-sm font-medium ${
+                      isExpanded ? "text-cyan-400 bg-cyan-400/10 border border-cyan-400/20" : "text-foreground/70 hover:text-foreground hover:bg-white/5 border border-transparent hover:border-white/10"
                     }`}
                   >
                     <div className="flex items-center space-x-3">
@@ -174,10 +174,10 @@ export default function Sidebar() {
                   <Link
                     href={item.href!}
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all duration-200 group text-sm font-medium ${
+                    className={`flex items-center space-x-3 px-4 py-2.5 rounded-xl transition-all duration-300 group text-sm font-medium border ${
                       isActive
-                        ? "bg-cyan-500 text-white shadow-md shadow-cyan-500/20"
-                        : "text-foreground/70 hover:text-foreground hover:bg-foreground/5"
+                        ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-[0_0_15px_rgba(6,182,212,0.4)] border-white/20 scale-[1.02]"
+                        : "border-transparent text-foreground/70 hover:text-foreground hover:bg-white/5 hover:border-white/10 hover:scale-[1.01]"
                     }`}
                   >
                     <span className={`${isActive ? "text-white" : "text-foreground/50 group-hover:text-cyan-400 transition-colors"}`}>
@@ -195,7 +195,7 @@ export default function Sidebar() {
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.2, ease: "easeInOut" }}
-                      className="ml-9 mt-1 mb-2 overflow-hidden border-l border-sidebar-border pl-2 space-y-1"
+                      className="ml-9 mt-1 mb-2 overflow-hidden border-l border-white/10 pl-2 space-y-1"
                     >
                       {item.submenus!.map((sub) => {
                         const isSubActive = pathname === sub.href;

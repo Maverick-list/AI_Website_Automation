@@ -272,7 +272,8 @@ export default function BroadcastAutomationPage() {
         </div>
 
         {/* WhatsApp Bot Connection Widget */}
-        <div className="flex items-center space-x-3 bg-card border border-sidebar-border rounded-2xl p-4 shadow-sm">
+        <div className="flex items-center space-x-3 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[1.5rem] p-4 shadow-xl relative overflow-hidden group hover:bg-white/10 transition-all duration-300">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
           <div className="flex flex-col">
             <div className="flex items-center space-x-2">
               <span className={`w-3 h-3 rounded-full ${isConnected === true ? "bg-green-500 animate-pulse" : isConnected === false ? "bg-red-500" : "bg-yellow-500"}`} />
@@ -297,7 +298,8 @@ export default function BroadcastAutomationPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Broadcast Sender Form */}
-        <div className="lg:col-span-1 bg-card border border-sidebar-border rounded-3xl p-8 shadow-sm h-fit">
+        <div className="lg:col-span-1 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 shadow-2xl h-fit relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
           <div className="flex items-center space-x-3 mb-6">
             <div className="w-10 h-10 bg-accent/10 text-accent rounded-xl flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
@@ -311,7 +313,7 @@ export default function BroadcastAutomationPage() {
               <select
                 value={senderAccount}
                 onChange={(e) => setSenderAccount(e.target.value)}
-                className="w-full bg-foreground/5 border border-sidebar-border rounded-xl px-4 py-3 mt-1 focus:ring-2 focus:ring-accent/50 outline-none appearance-none"
+                className="w-full bg-black/20 backdrop-blur-md border border-white/10 rounded-xl px-4 py-3 mt-1 focus:ring-2 focus:ring-accent/50 outline-none appearance-none transition-all hover:bg-black/30"
               >
                 {senders.length === 0 && <option value="default">Default Sender</option>}
                 {senders.map(s => (
@@ -321,7 +323,7 @@ export default function BroadcastAutomationPage() {
             </div>
             
             {/* WhatsApp Connection Status & QR */}
-            <div className="flex flex-col p-6 bg-foreground/5 border border-sidebar-border rounded-2xl items-center text-center space-y-4 relative overflow-hidden">
+            <div className="flex flex-col p-6 bg-black/20 backdrop-blur-md border border-white/10 rounded-2xl items-center text-center space-y-4 relative overflow-hidden transition-all hover:border-white/20">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-green-600"></div>
               <h3 className="font-bold text-lg">Hubungkan Perangkat Baru</h3>
               
@@ -441,7 +443,7 @@ export default function BroadcastAutomationPage() {
                 value={target}
                 onChange={(e) => setTarget(e.target.value)}
                 placeholder="contoh: 120363401263735503@g.us"
-                className="w-full bg-foreground/5 border border-sidebar-border rounded-xl px-4 py-3 mt-1 focus:ring-2 focus:ring-accent/50 outline-none"
+                className="w-full bg-black/20 backdrop-blur-md border border-white/10 rounded-xl px-4 py-3 mt-1 focus:ring-2 focus:ring-accent/50 outline-none transition-all hover:bg-black/30"
               />
             </div>
 
@@ -453,14 +455,14 @@ export default function BroadcastAutomationPage() {
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Tulis pesan broadcast di sini... (Mendukung markdown WhatsApp seperti *tebal* atau _miring_)"
                 rows={5}
-                className="w-full bg-foreground/5 border border-sidebar-border rounded-xl px-4 py-3 mt-1 focus:ring-2 focus:ring-accent/50 outline-none resize-none"
+                className="w-full bg-black/20 backdrop-blur-md border border-white/10 rounded-xl px-4 py-3 mt-1 focus:ring-2 focus:ring-accent/50 outline-none resize-none transition-all hover:bg-black/30"
               />
             </div>
 
             <div>
               <label className="text-xs font-bold text-foreground/50 uppercase">Gambar / Media (Opsional)</label>
               <div className="mt-1 flex items-center justify-center w-full">
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-sidebar-border rounded-xl cursor-pointer bg-foreground/5 hover:bg-foreground/10 transition-colors">
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/20 rounded-xl cursor-pointer bg-black/20 backdrop-blur-md hover:bg-black/40 hover:border-white/40 transition-all duration-300">
                   <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
                     <svg className="w-8 h-8 mb-3 text-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
                     <p className="mb-2 text-sm text-foreground/70"><span className="font-semibold">Klik untuk upload</span> atau drag and drop</p>
@@ -494,7 +496,7 @@ export default function BroadcastAutomationPage() {
             </div>
 
             {/* Toggle Schedule */}
-            <div className="flex items-center justify-between p-4 bg-foreground/[0.02] border border-sidebar-border rounded-2xl">
+            <div className="flex items-center justify-between p-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl hover:bg-white/10 transition-all cursor-pointer" onClick={() => setIsScheduled(!isScheduled)}>
               <div className="flex flex-col">
                 <span className="text-sm font-bold">Jadwalkan Broadcast</span>
                 <span className="text-xs text-foreground/40">Kirim di waktu mendatang</span>
@@ -557,20 +559,24 @@ export default function BroadcastAutomationPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full bg-accent text-white py-4 rounded-2xl font-black text-lg shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center space-x-2"
+              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-4 rounded-2xl font-black text-lg shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center space-x-2 border border-white/20 relative overflow-hidden group"
             >
+              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
+              <span className="relative z-10 flex items-center space-x-2">
               {submitting ? (
                 <span className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
               ) : (
                 <span>{isRecurring ? "Mulai Spam Berulang" : (isScheduled ? "Jadwalkan Broadcast" : "Kirim Sekarang")}</span>
               )}
+              </span>
             </button>
           </form>
         </div>
 
         {/* Active Schedules List */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-card border border-sidebar-border rounded-3xl p-8 shadow-sm">
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-bl from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-yellow-500/10 text-yellow-500 rounded-xl flex items-center justify-center">
@@ -593,8 +599,9 @@ export default function BroadcastAutomationPage() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {activeSchedules.map((item) => (
-                  <div key={item.id} className="p-5 border border-sidebar-border bg-foreground/[0.02] rounded-2xl flex flex-col justify-between">
-                    <div>
+                  <div key={item.id} className="p-6 border border-white/10 bg-black/20 backdrop-blur-md rounded-2xl flex flex-col justify-between hover:-translate-y-1 hover:shadow-xl hover:border-white/20 transition-all duration-300 relative group/card">
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity rounded-2xl pointer-events-none"></div>
+                    <div className="relative z-10">
                       <div className="flex justify-between items-start mb-2">
                         <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
                           item.type === "recurring" ? "text-blue-500 bg-blue-500/10" : "text-accent bg-accent/10"
@@ -638,8 +645,9 @@ export default function BroadcastAutomationPage() {
           </div>
 
           {/* Broadcast History logs */}
-          <div className="bg-card border border-sidebar-border rounded-3xl p-8 shadow-sm">
-            <div className="flex items-center justify-between mb-6">
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            <div className="relative z-10 flex items-center justify-between mb-6">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-green-500/10 text-green-500 rounded-xl flex items-center justify-center">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
@@ -668,9 +676,9 @@ export default function BroadcastAutomationPage() {
                       <th className="pb-3 text-right">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-sidebar-border/50">
+                  <tbody className="divide-y divide-white/5">
                     {historyBroadcasts.map((item) => (
-                      <tr key={item.id} className="hover:bg-foreground/[0.01] transition-all">
+                      <tr key={item.id} className="hover:bg-white/5 transition-colors duration-200">
                         <td className="py-4 text-xs text-foreground/50">
                           {new Date(item.createdAt).toLocaleString("id-ID")}
                         </td>
