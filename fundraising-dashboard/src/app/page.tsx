@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Search, Mail, ArrowRight, CheckCircle2, Bot, Bell, Shield, Smartphone, Briefcase, Code, BarChart, Users } from "lucide-react";
+import { Search, Mail, ArrowRight, CheckCircle2, Bot, Bell, Shield, Smartphone, Briefcase, Code, BarChart, Users, FileText } from "lucide-react";
 
 // Social Icons
 const InstagramIcon = ({ className, size = 24 }: { className?: string, size?: number }) => (
