@@ -127,7 +127,7 @@ function sendBroadcast(id) {
         args.push('--media', b.media);
     }
 
-    const process = spawn('node', args, { shell: true });
+    const process = spawn('node', args);
 
     let stdoutData = "";
     let stderrData = "";

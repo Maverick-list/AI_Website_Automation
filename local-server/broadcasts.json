@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "id": "3c252f09-d830-4fdd-855d-0b7b9567b899",
+    "target": "+6285191769521",
+    "message": "Halo aku ingin mengirimkan anda pesan",
+    "media": null,
+    "type": "immediate",
+    "status": "failed",
+    "time": null,
+    "createdAt": "2026-06-19T09:00:54.721Z",
+    "executedAt": "2026-06-19T09:00:57.156Z",
+    "error": "Too many arguments for this command.\nTry: openclaw message send --help\n"
+  }
+]

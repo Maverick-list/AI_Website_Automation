@@ -15,3 +15,6 @@ data.json
 OpenClaw/whatsapp_profile/
 OpenClaw/__pycache__/
 OpenClaw/*.log
+
+.vercel
+.env*

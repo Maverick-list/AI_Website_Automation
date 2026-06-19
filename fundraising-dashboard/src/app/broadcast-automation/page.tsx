@@ -33,7 +33,7 @@ export default function BroadcastAutomationPage() {
   const fetchStatus = async () => {
     setCheckingStatus(true);
     try {
-      const res = await fetch("http://localhost:5000/api/status");
+      const res = await fetch("https://mavecode-api.loca.lt/api/status");
       const data = await res.json();
       setIsConnected(data.connected);
     } catch (e) {
@@ -46,7 +46,7 @@ export default function BroadcastAutomationPage() {
   const fetchBroadcasts = async () => {
     setLoadingBroadcasts(true);
     try {
-      const res = await fetch("http://localhost:5000/api/broadcasts");
+      const res = await fetch("https://mavecode-api.loca.lt/api/broadcasts");
       const data = await res.json();
       setBroadcasts(data);
     } catch (e) {
@@ -74,7 +74,7 @@ export default function BroadcastAutomationPage() {
 
     setSubmitting(true);
     try {
-      const res = await fetch("http://localhost:5000/api/broadcasts", {
+      const res = await fetch("https://mavecode-api.loca.lt/api/broadcasts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -106,7 +106,7 @@ export default function BroadcastAutomationPage() {
     if (!confirm("Apakah Anda yakin ingin membatalkan jadwal broadcast ini?")) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/broadcasts/${id}`, {
+      const res = await fetch(`https://mavecode-api.loca.lt/api/broadcasts/${id}`, {
         method: "DELETE",
       });
       const data = await res.json();
