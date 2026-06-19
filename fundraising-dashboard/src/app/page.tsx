@@ -39,9 +39,11 @@ export default function LandingPage() {
 
         {/* CTA Button */}
         <div className="hidden lg:block">
-          <Link href="/login" className="bg-[#00B074] hover:bg-[#009b65] text-white px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg shadow-[#00B074]/30">
-            Book A Demo
-          </Link>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Link href="/login" className="bg-[#00B074] hover:bg-[#009b65] text-white px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg shadow-[#00B074]/30 block">
+              Book A Demo
+            </Link>
+          </motion.div>
         </div>
 
         {/* Mobile Menu Button */}
@@ -75,7 +77,12 @@ export default function LandingPage() {
           </p>
 
           {/* Search/CTA Bar */}
-          <div className="bg-white rounded-full shadow-[0_15px_40px_rgba(0,0,0,0.08)] border border-gray-100 p-2 flex items-center justify-between max-w-md">
+          <motion.div 
+            drag dragConstraints={{ left: -30, right: 30, top: -30, bottom: 30 }}
+            whileHover={{ scale: 1.02, cursor: "grab" }}
+            whileTap={{ cursor: "grabbing" }}
+            className="bg-white rounded-full shadow-[0_15px_40px_rgba(0,0,0,0.08)] border border-gray-100 p-2 flex items-center justify-between max-w-md"
+          >
             <div className="flex items-center text-gray-400 pl-4">
               <Search size={20} />
               <input 
@@ -84,10 +91,12 @@ export default function LandingPage() {
                 className="bg-transparent border-none outline-none pl-3 text-gray-700 w-full"
               />
             </div>
-            <Link href="/login" className="bg-[#00B074] hover:bg-[#009b65] text-white px-8 py-3 rounded-full font-semibold transition-all shadow-lg shadow-[#00B074]/30">
-              Search
-            </Link>
-          </div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link href="/login" className="bg-[#00B074] hover:bg-[#009b65] text-white px-8 py-3 rounded-full font-semibold transition-all shadow-lg shadow-[#00B074]/30 block">
+                Search
+              </Link>
+            </motion.div>
+          </motion.div>
         </motion.div>
 
         {/* Right Column - Image & Floating Cards */}
@@ -109,6 +118,9 @@ export default function LandingPage() {
           <motion.div 
             animate={{ y: [0, -10, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            drag dragConstraints={{ left: -50, right: 50, top: -50, bottom: 50 }}
+            whileHover={{ scale: 1.05, cursor: "grab" }}
+            whileTap={{ cursor: "grabbing" }}
             className="absolute top-32 -left-10 bg-white rounded-2xl p-4 shadow-[0_15px_30px_rgba(0,0,0,0.1)] z-20 flex items-center gap-3 border border-gray-50"
           >
             <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-500">
@@ -121,6 +133,9 @@ export default function LandingPage() {
           <motion.div 
             animate={{ y: [0, 15, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            drag dragConstraints={{ left: -50, right: 50, top: -50, bottom: 50 }}
+            whileHover={{ scale: 1.05, cursor: "grab" }}
+            whileTap={{ cursor: "grabbing" }}
             className="absolute bottom-20 -left-4 bg-white rounded-2xl p-5 shadow-[0_15px_30px_rgba(0,0,0,0.1)] z-20 border border-gray-50"
           >
             <span className="font-bold text-gray-800 block mb-2">5k+ candidates get job</span>
@@ -140,6 +155,9 @@ export default function LandingPage() {
           <motion.div 
              animate={{ y: [0, -10, 0] }}
              transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+             drag dragConstraints={{ left: -50, right: 50, top: -50, bottom: 50 }}
+             whileHover={{ scale: 1.05, cursor: "grab" }}
+             whileTap={{ cursor: "grabbing" }}
              className="absolute bottom-10 left-1/4 bg-[#EAE6FF] rounded-2xl p-6 shadow-[0_15px_30px_rgba(0,0,0,0.05)] z-20 flex items-center gap-5 border border-white"
           >
             <div>
@@ -181,9 +199,11 @@ export default function LandingPage() {
             <p className="text-gray-500 mb-8 leading-relaxed">
               Discover opportunities from leading companies across various industries. Our platform hosts job postings from top-tier organizations, giving freelancers access to high-quality projects and reputable clients. Whether you're looking to work with innovative startups or established global brands.
             </p>
-            <Link href="/login" className="bg-[#00B074] hover:bg-[#009b65] text-white px-8 py-4 rounded-full font-semibold transition-all shadow-lg shadow-[#00B074]/30 inline-block">
-              Explore Opening Jobs
-            </Link>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="inline-block">
+              <Link href="/login" className="bg-[#00B074] hover:bg-[#009b65] text-white px-8 py-4 rounded-full font-semibold transition-all shadow-lg shadow-[#00B074]/30 block">
+                Explore Opening Jobs
+              </Link>
+            </motion.div>
           </motion.div>
 
           {/* Right Floating Mockups */}
@@ -194,6 +214,9 @@ export default function LandingPage() {
                initial={{ opacity: 0, x: 50 }}
                whileInView={{ opacity: 1, x: 0 }}
                viewport={{ once: true }}
+               drag dragConstraints={{ left: -50, right: 50, top: -50, bottom: 50 }}
+               whileHover={{ cursor: "grab" }}
+               whileTap={{ cursor: "grabbing" }}
                className="absolute top-10 right-0 w-[90%] bg-white rounded-3xl p-6 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100 flex flex-col gap-4 z-10"
              >
                 <div className="flex items-center justify-between border-b border-gray-50 pb-4">
@@ -233,7 +256,13 @@ export default function LandingPage() {
                  <Search size={16} />
                  <span className="text-sm">Search job</span>
                </div>
-               <div className="bg-[#00B074] text-white px-6 py-2 rounded-full text-sm font-bold">Search</div>
+               <motion.button 
+                whileHover={{ scale: 1.05 }} 
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-2 bg-[#00B074] text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-md shadow-[#00B074]/20"
+              >
+                 Search
+               </motion.button>
              </motion.div>
 
              {/* Mockup 3: LinkedIn Card Overlapping */}
@@ -242,6 +271,9 @@ export default function LandingPage() {
                whileInView={{ opacity: 1, y: 0 }}
                viewport={{ once: true }}
                transition={{ delay: 0.3 }}
+               drag dragConstraints={{ left: -50, right: 50, top: -50, bottom: 50 }}
+               whileHover={{ cursor: "grab" }}
+               whileTap={{ cursor: "grabbing" }}
                className="absolute bottom-10 left-10 w-[60%] bg-white rounded-3xl p-6 shadow-[0_30px_60px_rgba(0,0,0,0.12)] border border-gray-100 z-30 flex flex-col items-center text-center"
              >
                 <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 mb-3">
