@@ -118,5 +118,31 @@
     "createdAt": "2026-06-19T09:59:52.760Z",
     "executedAt": "2026-06-19T09:59:59.460Z",
     "error": null
+  },
+  {
+    "id": "6c1b38eb-058b-48a7-83f2-af1e24a396cb",
+    "target": "120363408705731444@g.us",
+    "message": "*🏕️FR PYLC🏕️*\r\n📢 READY AYAM PENYET KETUMBAR, MASIHH ANGETT YUU DIBELI!!\r\n\r\n💸Cuma 22k aja💸\r\n\r\n🍗ayam bumbu ketumbar yg bumbunya nagih\r\n🌶️+free sambal\r\n\r\nLANGSUNG ANTAR SEKARANG JUGA!\r\n\r\nSlot terbatas, jangan sampai kehabisan‼️\r\n\r\n📲+62 895-0491-9474 - saski\r\n      +62 812-1431-8731",
+    "media": null,
+    "type": "scheduled",
+    "status": "sent",
+    "time": "2026-06-19T17:13",
+    "createdAt": "2026-06-19T10:12:27.391Z",
+    "executedAt": "2026-06-19T10:13:11.665Z",
+    "error": null
+  },
+  {
+    "id": "ed832cbc-e6fe-4b31-96d7-06983923296a",
+    "target": "120363408705731444@g.us",
+    "message": "*🏕️FR PYLC🏕️*\r\n📢 READY AYAM PENYET KETUMBAR, MASIHH ANGETT YUU DIBELI!!\r\n\r\n💸Cuma 22k aja💸\r\n\r\n🍗ayam bumbu ketumbar yg bumbunya nagih\r\n🌶️+free sambal\r\n\r\nLANGSUNG ANTAR SEKARANG JUGA!\r\n\r\nSlot terbatas, jangan sampai kehabisan‼️\r\n\r\n📲+62 895-0491-9474\r\n      +62 812-1431-8731",
+    "media": [
+      "E:\\AI_Automation_Website\\local-server\\uploads\\9b9d074d-83cf-4c5d-bcfb-fc81ffc4dc6e.jpg"
+    ],
+    "type": "scheduled",
+    "status": "sent",
+    "time": "2026-06-19T17:17",
+    "createdAt": "2026-06-19T10:15:23.474Z",
+    "executedAt": "2026-06-19T10:17:14.946Z",
+    "error": null
   }
 ]

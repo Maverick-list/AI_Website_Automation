@@ -6,7 +6,7 @@ interface Broadcast {
   id: string;
   target: string;
   message: string;
-  media: string | null;
+  media: string[] | string | null;
   type: "immediate" | "scheduled";
   status: "pending" | "sending" | "sent" | "failed" | "cancelled";
   time: string | null;
@@ -323,7 +323,11 @@ export default function BroadcastAutomationPage() {
                       <p className="text-xs font-bold text-foreground/80 mb-1">Ke: {item.target}</p>
                       <p className="text-sm text-foreground/70 line-clamp-3 italic mb-4">"{item.message}"</p>
                       {item.media && (
-                        <p className="text-[10px] text-foreground/40 truncate mb-4">Media: {item.media.split(/[\\/]/).pop()}</p>
+                        <p className="text-[10px] text-foreground/40 truncate mb-4">
+                          Media: {Array.isArray(item.media) 
+                            ? item.media.map(m => m.split(/[\\/]/).pop()).join(", ")
+                            : item.media.split(/[\\/]/).pop()}
+                        </p>
                       )}
                     </div>
                     <button
