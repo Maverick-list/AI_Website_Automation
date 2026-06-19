@@ -16,6 +16,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-accent: var(--accent);
   --color-card: var(--card);
+  --font-sans: var(--font-jakarta), sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {

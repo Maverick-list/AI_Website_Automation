@@ -8,9 +8,10 @@ export default function RootLayoutInner({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isLandingPage = pathname === "/";
+  const standalonePages = ["/", "/login", "/signup", "/unlock-automation"];
+  const isStandalone = standalonePages.includes(pathname);
 
-  if (isLandingPage) {
+  if (isStandalone) {
     return (
       <div className="min-h-screen w-full">
         {children}

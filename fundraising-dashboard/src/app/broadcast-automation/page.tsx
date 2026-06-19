@@ -20,13 +20,19 @@ interface Broadcast {
 export default function BroadcastAutomationPage() {
   const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
-  const [checkingStatus, setCheckingStatus] = useState(false);
+  const [checkingStatus, setCheckingStatus] = useState(true);
   const [loadingBroadcasts, setLoadingBroadcasts] = useState(false);
   const [senders, setSenders] = useState<{id: string, label: string}[]>([]);
   
   // QR Code State
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [qrStatus, setQrStatus] = useState<string>("generating");
+
+  // Pairing Mode State
+  const [pairingMethod, setPairingMethod] = useState<"qr" | "code">("qr");
+  const [pairingPhone, setPairingPhone] = useState("");
+  const [pairingCode, setPairingCode] = useState<string | null>(null);
+  const [requestingPairCode, setRequestingPairCode] = useState(false);
 
   // Form State
   const [senderAccount, setSenderAccount] = useState("default");
@@ -39,18 +45,23 @@ export default function BroadcastAutomationPage() {
   const [intervalMinutes, setIntervalMinutes] = useState(5);
   const [submitting, setSubmitting] = useState(false);
 
+  // Dynamic API URL for resilient local testing when internet/tunnel is down
+  const API_BASE = typeof window !== "undefined" && window.location.hostname === "localhost" 
+    ? "http://localhost:5000/api" 
+    : "https://mavecode-api-v2.loca.lt/api";
+
   // Load status and broadcasts
   const fetchStatus = async () => {
     setCheckingStatus(true);
     try {
-      const res = await fetch("https://mavecode-api-v2.loca.lt/api/status", {
+      const res = await fetch(`${API_BASE}/status`, {
         headers: { "Bypass-Tunnel-Reminder": "true" }
       });
       const data = await res.json();
       setIsConnected(data.connected);
       
       // Fetch Senders
-      const sendersRes = await fetch("https://mavecode-api-v2.loca.lt/api/senders", {
+      const sendersRes = await fetch(`${API_BASE}/senders`, {
         headers: { "Bypass-Tunnel-Reminder": "true" }
       });
       const sendersData = await sendersRes.json();
@@ -70,7 +81,7 @@ export default function BroadcastAutomationPage() {
   const fetchBroadcasts = async () => {
     setLoadingBroadcasts(true);
     try {
-      const res = await fetch("https://mavecode-api-v2.loca.lt/api/broadcasts", {
+      const res = await fetch(`${API_BASE}/broadcasts`, {
         headers: { "Bypass-Tunnel-Reminder": "true" }
       });
       const data = await res.json();
@@ -84,7 +95,7 @@ export default function BroadcastAutomationPage() {
 
   const fetchQR = async () => {
     try {
-      const res = await fetch("https://mavecode-api-v2.loca.lt/api/wa/add-device", {
+      const res = await fetch(`${API_BASE}/wa/add-device`, {
         headers: { "Bypass-Tunnel-Reminder": "true" }
       });
       const data = await res.json();
@@ -103,21 +114,31 @@ export default function BroadcastAutomationPage() {
     fetchStatus();
     fetchBroadcasts();
     fetchQR();
-    // Poll every 15 seconds to keep dashboard fresh
-    const interval = setInterval(() => {
-      fetchStatus();
-      fetchBroadcasts();
+    
+    // Poll QR every 3 seconds so it never expires on screen
+    const qrInterval = setInterval(() => {
       fetchQR();
+      fetchStatus();
+    }, 3000);
+    
+    // Poll broadcasts every 15 seconds
+    const dataInterval = setInterval(() => {
+      fetchBroadcasts();
     }, 15000);
-    return () => clearInterval(interval);
+    
+    return () => {
+      clearInterval(qrInterval);
+      clearInterval(dataInterval);
+    };
   }, []);
 
   const handleReconnect = async () => {
     setCheckingStatus(true);
     setQrStatus("generating");
     setQrCode(null);
+    setPairingCode(null);
     try {
-      await fetch("https://mavecode-api-v2.loca.lt/api/wa/reconnect", {
+      await fetch(`${API_BASE}/wa/reconnect`, {
         method: "POST",
         headers: { "Bypass-Tunnel-Reminder": "true" }
       });
@@ -128,6 +149,34 @@ export default function BroadcastAutomationPage() {
     } catch (e) {
       console.error("Failed to reconnect", e);
       setCheckingStatus(false);
+    }
+  };
+
+  const handleRequestPairingCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pairingPhone) return alert("Masukkan nomor WhatsApp tujuan!");
+    
+    setRequestingPairCode(true);
+    try {
+      const res = await fetch(`${API_BASE}/wa/pair`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Bypass-Tunnel-Reminder": "true" 
+        },
+        body: JSON.stringify({ phoneNumber: pairingPhone })
+      });
+      const data = await res.json();
+      if (data.error) {
+        alert("Gagal: " + data.error);
+      } else if (data.code) {
+        setPairingCode(data.code);
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Gagal menghubungi server untuk pairing code.");
+    } finally {
+      setRequestingPairCode(false);
     }
   };
 
@@ -165,7 +214,7 @@ export default function BroadcastAutomationPage() {
         }
       }
 
-      const res = await fetch("https://mavecode-api-v2.loca.lt/api/broadcasts", {
+      const res = await fetch(`${API_BASE}/broadcasts`, {
         method: "POST",
         headers: { 
           "Bypass-Tunnel-Reminder": "true"
@@ -195,7 +244,7 @@ export default function BroadcastAutomationPage() {
     if (!confirm("Apakah Anda yakin ingin membatalkan jadwal broadcast ini?")) return;
 
     try {
-      const res = await fetch(`https://mavecode-api-v2.loca.lt/api/broadcasts/${id}`, {
+      const res = await fetch(`${API_BASE}/broadcasts/${id}`, {
         method: "DELETE",
         headers: { "Bypass-Tunnel-Reminder": "true" }
       });
@@ -276,29 +325,112 @@ export default function BroadcastAutomationPage() {
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-green-600"></div>
               <h3 className="font-bold text-lg">Hubungkan Perangkat Baru</h3>
               
-              {qrStatus === "connected" ? (
-                <div className="flex flex-col items-center text-green-500 space-y-2">
-                  <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              {/* CONNECT WHATSAPP WIDGET */}
+              <div className="bg-gradient-to-br from-card to-background rounded-3xl border border-sidebar-border overflow-hidden shadow-lg relative group">
+                <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                
+                <div className="p-6">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold">Hubungkan Perangkat Baru</h2>
+                      <p className="text-sm text-foreground/50">Tautkan akun WhatsApp tambahan.</p>
+                    </div>
                   </div>
-                  <p className="font-bold">WhatsApp Terhubung!</p>
-                  <p className="text-xs text-foreground/50">Sistem siap digunakan untuk mengirim pesan otomatis.</p>
+
+                  {isConnected && !checkingStatus ? (
+                    <div className="flex flex-col items-center justify-center py-6 text-center">
+                      <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-500"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                      </div>
+                      <h3 className="text-xl font-bold text-green-500 mb-2">WhatsApp Terhubung!</h3>
+                      <p className="text-sm text-foreground/60 max-w-[200px]">Anda sudah dapat mengirim broadcast.</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center w-full min-h-[300px]">
+                      
+                      {/* Pairing Method Tabs */}
+                      <div className="flex p-1 bg-foreground/5 rounded-xl w-full mb-6 relative z-10">
+                        <button 
+                          onClick={() => setPairingMethod("qr")}
+                          className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${pairingMethod === "qr" ? "bg-background shadow text-foreground" : "text-foreground/50 hover:text-foreground"}`}
+                        >
+                          Scan QR Code
+                        </button>
+                        <button 
+                          onClick={() => setPairingMethod("code")}
+                          className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${pairingMethod === "code" ? "bg-background shadow text-foreground" : "text-foreground/50 hover:text-foreground"}`}
+                        >
+                          Gunakan Kode (Jarak Jauh)
+                        </button>
+                      </div>
+
+                      {pairingMethod === "qr" ? (
+                        /* QR CODE MODE */
+                        qrCode ? (
+                          <div className="relative group">
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500" />
+                            <div className="bg-white p-3 rounded-2xl relative">
+                              <img src={qrCode} alt="WhatsApp QR Code" className="w-[200px] h-[200px]" />
+                            </div>
+                            <p className="text-center text-xs text-foreground/50 mt-4 animate-pulse">Scan QR melalui aplikasi WhatsApp</p>
+                            <p className="text-center text-[10px] text-blue-500/70 mt-1">QR ini otomatis diperbarui setiap 3 detik</p>
+                          </div>
+                        ) : (
+                          <div className="w-[200px] h-[200px] border-2 border-dashed border-sidebar-border rounded-3xl flex flex-col items-center justify-center p-6 text-center animate-pulse">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground/30 mb-4"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            <span className="text-sm font-medium text-foreground/50">Memuat QR Code...</span>
+                          </div>
+                        )
+                      ) : (
+                        /* PAIRING CODE MODE */
+                        <div className="w-full">
+                          {pairingCode ? (
+                            <div className="flex flex-col items-center justify-center text-center">
+                              <p className="text-sm text-foreground/60 mb-4">Masukkan kode ini di WhatsApp Anda:</p>
+                              <div className="text-4xl font-mono font-bold tracking-[0.25em] bg-foreground/5 p-6 rounded-2xl border border-sidebar-border shadow-inner text-blue-500">
+                                {pairingCode}
+                              </div>
+                              <p className="text-xs text-foreground/40 mt-6 max-w-[250px]">
+                                Buka WhatsApp &gt; Perangkat Tertaut &gt; Tautkan Perangkat &gt; Tautkan dengan Nomor Telepon Saja.
+                              </p>
+                            </div>
+                          ) : (
+                            <form onSubmit={handleRequestPairingCode} className="flex flex-col space-y-4">
+                              <div>
+                                <label className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-2 block">Nomor WhatsApp HP Anda</label>
+                                <input
+                                  type="text"
+                                  placeholder="Contoh: 628123456789"
+                                  value={pairingPhone}
+                                  onChange={(e) => setPairingPhone(e.target.value)}
+                                  className="w-full bg-background border border-sidebar-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-mono"
+                                  required
+                                />
+                                <p className="text-[10px] text-foreground/40 mt-1">Gunakan kode negara (misal 62) tanpa tanda plus (+).</p>
+                              </div>
+                              <button
+                                type="submit"
+                                disabled={requestingPairCode}
+                                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center space-x-2 shadow-lg shadow-blue-500/20"
+                              >
+                                {requestingPairCode ? (
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                                ) : (
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                )}
+                                <span>{requestingPairCode ? "Meminta Kode..." : "Dapatkan Kode Tautan"}</span>
+                              </button>
+                            </form>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              ) : qrCode ? (
-                <div className="flex flex-col items-center space-y-3">
-                  <p className="text-sm text-foreground/70">Buka WhatsApp di HP Anda, tap menu (⋮), pilih Tautkan Perangkat, lalu scan QR Code di bawah:</p>
-                  <div className="bg-white p-2 rounded-xl shadow-lg border border-white/10">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={qrCode} alt="WhatsApp QR Code" className="w-48 h-48" />
-                  </div>
-                  <p className="text-xs text-yellow-500 font-medium animate-pulse">Menunggu pindaian...</p>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center space-y-3">
-                  <div className="w-12 h-12 border-4 border-foreground/10 border-t-green-500 rounded-full animate-spin"></div>
-                  <p className="text-sm text-foreground/70">{qrStatus === "generating" ? "Sedang menyiapkan QR Code, mohon tunggu..." : "Memuat status..."}</p>
-                </div>
-              )}
+              </div>
             </div>
 
             <div>

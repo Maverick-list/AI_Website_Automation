@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 const features = [
   {
@@ -51,304 +54,368 @@ const features = [
   },
 ];
 
-const steps = [
-  {
-    num: "01",
-    title: "Hubungkan WhatsApp",
-    description: "Scan QR Code atau gunakan Pairing Code untuk menautkan akun WhatsApp Anda dalam hitungan detik.",
-  },
-  {
-    num: "02",
-    title: "Buat Konten dengan AI",
-    description: "Manfaatkan AI untuk menghasilkan pesan promosi, caption, dan strategi marketing yang menarik.",
-  },
-  {
-    num: "03",
-    title: "Kirim & Pantau Otomatis",
-    description: "Jadwalkan pengiriman broadcast, pantau statistik, dan kelola bisnis Anda dari satu dashboard.",
-  },
-];
+const staggerContainer: any = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15
+    }
+  }
+};
 
-const stats = [
-  { value: "10x", label: "Jangkauan Lebih Luas", description: "dibanding metode manual" },
-  { value: "80%", label: "Hemat Waktu", description: "dengan otomasi broadcast" },
-  { value: "24/7", label: "Otomatis Berjalan", description: "tanpa perlu diawasi" },
-  { value: "∞", label: "Tanpa Batas", description: "jumlah pesan & kontak" },
-];
+const fadeUp: any = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50, damping: 10 } }
+};
 
-const testimonials = [
-  {
-    name: "Ahmad Fauzi",
-    role: "Owner Toko Online",
-    text: "Sejak pakai MaveCode AI, penjualan saya naik 3x lipat. Broadcast WA otomatis benar-benar menghemat waktu saya!",
-    avatar: "AF",
-  },
-  {
-    name: "Sari Dewi",
-    role: "Digital Marketer",
-    text: "Fitur AI untuk generate konten marketing itu game-changer. Saya bisa bikin caption dan strategi dalam hitungan detik.",
-    avatar: "SD",
-  },
-  {
-    name: "Budi Santoso",
-    role: "UMKM Kuliner",
-    text: "Dashboard-nya sangat lengkap. Inventori, keuangan, dan broadcast semua jadi satu. Praktis banget!",
-    avatar: "BS",
-  },
-];
-
-export default function Home() {
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-hidden selection:bg-accent/30 font-sans">
+      
+      {/* Background Decorative Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <motion.div 
+          animate={{ 
+            y: [0, -30, 0], 
+            scale: [1, 1.05, 1],
+            opacity: [0.15, 0.25, 0.15]
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/20 blur-[120px]" 
+        />
+        <motion.div 
+          animate={{ 
+            y: [0, 40, 0], 
+            scale: [1, 1.1, 1],
+            opacity: [0.15, 0.2, 0.15]
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-600/20 blur-[120px]" 
+        />
+      </div>
 
-      {/* ─── NAVBAR ─── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      {/* Navbar */}
+      <motion.nav 
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="fixed top-0 w-full border-b border-white/5 bg-background/50 backdrop-blur-xl z-50"
+      >
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
             </div>
-            <span className="text-lg font-bold gradient-text">MaveCode AI</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">MaveCode AI</span>
           </div>
-          <div className="hidden md:flex items-center space-x-8">
-            <a href="#features" className="text-sm text-foreground/60 hover:text-foreground transition-colors">Fitur</a>
-            <a href="#cara-kerja" className="text-sm text-foreground/60 hover:text-foreground transition-colors">Cara Kerja</a>
-            <a href="#manfaat" className="text-sm text-foreground/60 hover:text-foreground transition-colors">Manfaat</a>
-            <a href="#testimonials" className="text-sm text-foreground/60 hover:text-foreground transition-colors">Testimoni</a>
-          </div>
-          <Link
-            href="/broadcast-automation"
-            className="px-5 py-2 text-sm font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg hover:shadow-blue-500/25 transition-all hover:scale-105"
-          >
-            Masuk Dashboard
-          </Link>
-        </div>
-      </nav>
-
-      {/* ─── HERO ─── */}
-      <section className="relative min-h-screen flex items-center justify-center landing-hero-bg landing-grid pt-16">
-        {/* Floating orbs */}
-        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/8 rounded-full blur-3xl animate-float delay-300" />
-
-        <div className="relative z-10 text-center max-w-4xl mx-auto px-6">
-          <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full glass mb-8 animate-fade-in-up opacity-0">
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-xs font-medium text-foreground/70">Platform Marketing AI #1 di Indonesia</span>
+          
+          <div className="hidden md:flex space-x-8 text-sm font-medium text-gray-400">
+            <a href="#fitur" className="hover:text-white transition-colors hover:scale-105 transform">Fitur</a>
+            <a href="#cara-kerja" className="hover:text-white transition-colors hover:scale-105 transform">Cara Kerja</a>
+            <a href="#manfaat" className="hover:text-white transition-colors hover:scale-105 transform">Manfaat</a>
+            <a href="#testimoni" className="hover:text-white transition-colors hover:scale-105 transform">Testimoni</a>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold leading-tight animate-fade-in-up opacity-0 delay-100">
-            Otomasi Marketing
-            <br />
-            <span className="gradient-text">Berbasis AI</span>
-          </h1>
-
-          <p className="text-lg md:text-xl text-foreground/50 max-w-2xl mx-auto mt-8 leading-relaxed animate-fade-in-up opacity-0 delay-200">
-            Kelola bisnis Anda dengan platform terlengkap — WhatsApp Broadcast otomatis, 
-            konten AI, inventori, keuangan, dan analitik — semua dalam satu dashboard.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10 animate-fade-in-up opacity-0 delay-300">
-            <Link
-              href="/broadcast-automation"
-              className="px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-lg shadow-2xl shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105 transition-all duration-300 flex items-center space-x-2"
-            >
-              <span>Mulai Sekarang</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </Link>
-            <a
-              href="#features"
-              className="px-8 py-4 rounded-2xl border border-foreground/10 text-foreground/70 font-semibold text-lg hover:bg-foreground/5 hover:border-foreground/20 transition-all duration-300"
-            >
-              Pelajari Lebih Lanjut
-            </a>
-          </div>
-
-          {/* Mini feature badges */}
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-16 animate-fade-in-up opacity-0 delay-500">
-            {["WhatsApp Broadcast", "AI Content", "Inventory", "Finance", "Orders"].map((f) => (
-              <span key={f} className="px-4 py-1.5 rounded-full text-xs font-medium glass text-foreground/60">
-                {f}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── FEATURES ─── */}
-      <section id="features" className="py-32 relative">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-accent">Fitur Lengkap</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4">
-              Semua yang Anda butuhkan,
-              <br />
-              <span className="gradient-text">dalam satu platform.</span>
-            </h2>
-            <p className="text-foreground/50 max-w-xl mx-auto mt-6 text-lg">
-              Dari broadcast WhatsApp hingga laporan keuangan — kami menyediakan 
-              semua tools yang bisnis modern butuhkan.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, i) => (
-              <div
-                key={i}
-                className="glass-card rounded-3xl p-8 group cursor-pointer"
+          <div className="flex items-center space-x-4">
+            <Link href="/dashboard">
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-6 py-2.5 rounded-full bg-white text-black font-semibold text-sm hover:bg-gray-100 transition-colors"
               >
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                <p className="text-foreground/50 leading-relaxed">{feature.description}</p>
-              </div>
-            ))}
+                Masuk Dashboard
+              </motion.button>
+            </Link>
           </div>
         </div>
-      </section>
+      </motion.nav>
 
-      {/* ─── CARA KERJA ─── */}
-      <section id="cara-kerja" className="py-32 relative">
-        <div className="absolute inset-0 landing-hero-bg opacity-50" />
-        <div className="relative z-10 max-w-5xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-accent">Cara Kerja</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4">
-              Mulai dalam
-              <span className="gradient-text"> 3 langkah mudah</span>
-            </h2>
+      <main>
+        {/* Hero Section */}
+        <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6">
+          <div className="max-w-5xl mx-auto text-center">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, type: "spring" }}
+              className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8"
+            >
+              <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse"></span>
+              <span className="text-sm font-medium text-gray-300">Platform Marketing AI #1 di Indonesia</span>
+            </motion.div>
+            
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-tight"
+            >
+              Otomasi <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">Marketing</span> <br className="hidden md:block"/> Berbasis AI.
+            </motion.h1>
+            
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-lg md:text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed"
+            >
+              Satu platform terintegrasi untuk WhatsApp Broadcast, pembuatan konten AI, manajemen inventori, dan laporan keuangan bisnis Anda.
+            </motion.p>
+            
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            >
+              <Link href="/dashboard">
+                <motion.button 
+                  whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(59,130,246,0.5)" }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg transition-all w-full sm:w-auto"
+                >
+                  Mulai Gratis Sekarang
+                </motion.button>
+              </Link>
+              <Link href="#fitur">
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 text-white border border-white/10 font-semibold text-lg transition-all w-full sm:w-auto flex items-center justify-center gap-2"
+                >
+                  Pelajari Fitur
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </motion.button>
+              </Link>
+            </motion.div>
           </div>
+        </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {steps.map((step, i) => (
-              <div key={i} className="relative">
-                {i < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-12 left-[calc(100%_-_16px)] w-[calc(100%_-_40px)] h-px bg-gradient-to-r from-accent/40 to-transparent" />
-                )}
-                <div className="glass-card rounded-3xl p-8 text-center">
-                  <div className="text-5xl font-black gradient-text mb-6">{step.num}</div>
-                  <h3 className="text-xl font-bold mb-3">{step.title}</h3>
-                  <p className="text-foreground/50 leading-relaxed">{step.description}</p>
+        {/* Dashboard Preview / Mockup */}
+        <section className="px-6 relative z-10 pb-20">
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 1, type: "spring", stiffness: 40 }}
+            className="max-w-6xl mx-auto rounded-2xl border border-white/10 bg-black/40 p-2 backdrop-blur-2xl shadow-2xl overflow-hidden"
+          >
+            <div className="rounded-xl border border-white/5 bg-sidebar aspect-[16/9] md:aspect-[21/9] flex flex-col overflow-hidden relative">
+              <div className="h-12 border-b border-white/5 flex items-center px-4 space-x-2 bg-black/20">
+                <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
+              </div>
+              <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-blue-500/5 to-purple-500/5 relative">
+                {/* Floating Chat Bubble Mockup */}
+                <motion.div 
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute top-1/4 left-1/4 bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10 shadow-lg"
+                >
+                  <p className="text-xs text-green-400 mb-1">WhatsApp Sent ✓✓</p>
+                  <p className="text-sm font-medium text-white">Promo 50% berhasil dikirim ke 1,200 kontak!</p>
+                </motion.div>
+                <div className="text-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="url(#gradient)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="mx-auto opacity-50 mb-4"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#3b82f6" />
+                      <stop offset="100%" stopColor="#a855f7" />
+                    </linearGradient>
+                  </defs>
+                  <p className="text-gray-500 font-medium tracking-widest uppercase text-sm">Dashboard Preview</p>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+            </div>
+          </motion.div>
+        </section>
 
-      {/* ─── STATS / MANFAAT ─── */}
-      <section id="manfaat" className="py-32 relative">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-accent">Manfaat</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4">
-              Angka yang
-              <span className="gradient-text"> berbicara</span>
-            </h2>
-          </div>
+        {/* Features Section */}
+        <section id="fitur" className="py-24 px-6 bg-white/5 border-t border-white/5 relative">
+          <div className="max-w-7xl mx-auto">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl md:text-5xl font-bold mb-6">Fitur Lengkap untuk Skala Besar</h2>
+              <p className="text-gray-400 max-w-2xl mx-auto text-lg">Semua alat bantu (tools) yang Anda butuhkan untuk meningkatkan omset dan menghemat waktu operasional.</p>
+            </motion.div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat, i) => (
-              <div key={i} className="glass-card rounded-3xl p-8 text-center group">
-                <div className="text-5xl md:text-6xl font-black gradient-text mb-2 group-hover:scale-110 transition-transform duration-300">
-                  {stat.value}
-                </div>
-                <p className="text-sm font-bold text-foreground/80 mb-1">{stat.label}</p>
-                <p className="text-xs text-foreground/40">{stat.description}</p>
-              </div>
-            ))}
+            <motion.div 
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: "-50px" }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
+              {features.map((feature, idx) => (
+                <motion.div 
+                  variants={fadeUp}
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  key={idx} 
+                  className="p-8 rounded-2xl bg-black/40 border border-white/5 hover:border-white/20 transition-all group backdrop-blur-sm"
+                >
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-white mb-6 shadow-lg`}>
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-bold mb-3 text-white group-hover:text-blue-400 transition-colors">{feature.title}</h3>
+                  <p className="text-gray-400 leading-relaxed">{feature.description}</p>
+                </motion.div>
+              ))}
+            </motion.div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ─── TESTIMONIALS ─── */}
-      <section id="testimonials" className="py-32 relative">
-        <div className="absolute inset-0 landing-hero-bg opacity-30" />
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-accent">Testimoni</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4">
-              Dipercaya oleh
-              <span className="gradient-text"> pebisnis Indonesia</span>
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
-              <div key={i} className="glass-card rounded-3xl p-8">
-                <div className="flex items-center space-x-1 mb-6">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <svg key={star} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" strokeWidth="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        {/* Workflow Section */}
+        <section id="cara-kerja" className="py-24 px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+              >
+                <h2 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">Berjalan Otomatis di Belakang Layar</h2>
+                <p className="text-gray-400 text-lg mb-8 leading-relaxed">
+                  Tidak perlu lagi membalas pesan secara manual. Sistem kami dirancang untuk mengambil alih tugas monoton Anda.
+                </p>
+                <div className="space-y-6">
+                  {[
+                    { title: "Hubungkan WhatsApp", desc: "Scan kode QR atau gunakan kode tautan untuk menyambungkan nomor bisnis Anda dalam detik." },
+                    { title: "Buat Konten dengan AI", desc: "Tulis prompt singkat, AI kami akan menghasilkan kalimat promosi yang memikat hati pelanggan." },
+                    { title: "Kirim & Lacak", desc: "Sistem otomatis mengirim pesan ke ribuan kontak. Anda tinggal melihat laporan keberhasilan di dashboard." }
+                  ].map((step, idx) => (
+                    <motion.div 
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: idx * 0.2 }}
+                      key={idx} 
+                      className="flex gap-4"
+                    >
+                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center font-bold border border-blue-500/30">
+                        {idx + 1}
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-bold text-white mb-1">{step.title}</h4>
+                        <p className="text-gray-400 text-sm leading-relaxed">{step.desc}</p>
+                      </div>
+                    </motion.div>
                   ))}
                 </div>
-                <p className="text-foreground/70 leading-relaxed mb-8 italic">&ldquo;{t.text}&rdquo;</p>
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
-                    {t.avatar}
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold">{t.name}</p>
-                    <p className="text-xs text-foreground/50">{t.role}</p>
+              </motion.div>
+              
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="relative"
+              >
+                <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-3xl blur-[80px] opacity-20"></div>
+                <div className="relative rounded-3xl border border-white/10 bg-black/60 p-8 backdrop-blur-md shadow-2xl">
+                  {/* Mock Workflow UI */}
+                  <div className="space-y-4">
+                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-lg bg-green-500/20 text-green-400 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                      </div>
+                      <div className="flex-1">
+                        <div className="h-2 w-24 bg-gray-600 rounded mb-2"></div>
+                        <div className="h-2 w-48 bg-gray-700 rounded"></div>
+                      </div>
+                      <div className="text-green-400 text-xs font-bold px-2 py-1 bg-green-400/10 rounded">Connected</div>
+                    </div>
+                    
+                    <div className="flex justify-center my-2">
+                      <div className="h-8 w-px bg-white/20"></div>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                      </div>
+                      <div className="flex-1">
+                        <div className="h-2 w-32 bg-gray-600 rounded mb-2"></div>
+                        <div className="h-2 w-full bg-gray-700 rounded mb-2"></div>
+                        <div className="h-2 w-2/3 bg-gray-700 rounded"></div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-center my-2">
+                      <div className="h-8 w-px bg-white/20"></div>
+                    </div>
+
+                    <motion.div 
+                      animate={{ scale: [1, 1.02, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="p-4 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg flex items-center gap-4 border border-white/20"
+                    >
+                      <div className="w-12 h-12 rounded-lg bg-white/20 text-white flex items-center justify-center backdrop-blur-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-white font-bold text-sm mb-1">Broadcasting...</div>
+                        <div className="w-full bg-black/30 rounded-full h-1.5 overflow-hidden">
+                          <motion.div 
+                            animate={{ width: ["0%", "100%"] }}
+                            transition={{ duration: 3, repeat: Infinity }}
+                            className="bg-white h-1.5 rounded-full"
+                          ></motion.div>
+                        </div>
+                      </div>
+                      <div className="text-white text-xs font-bold">1.2k/5k</div>
+                    </motion.div>
                   </div>
                 </div>
-              </div>
-            ))}
+              </motion.div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ─── FINAL CTA ─── */}
-      <section className="py-32 relative">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <div className="glass-card rounded-[2rem] p-12 md:p-16 glow relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-600/5" />
-            <div className="relative z-10">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                Siap tingkatkan
-                <br />
-                <span className="gradient-text">bisnis Anda?</span>
-              </h2>
-              <p className="text-foreground/50 text-lg max-w-lg mx-auto mb-10">
-                Bergabunglah dengan ratusan pebisnis Indonesia yang sudah menggunakan MaveCode AI 
-                untuk mengotomasi marketing mereka.
-              </p>
-              <Link
-                href="/broadcast-automation"
-                className="inline-flex items-center space-x-2 px-10 py-5 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-lg shadow-2xl shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105 transition-all duration-300"
+        {/* CTA Section */}
+        <section className="py-24 px-6 relative overflow-hidden">
+          <div className="absolute inset-0 bg-blue-600/10 border-y border-blue-500/20"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-blue-500/20 blur-[120px] rounded-full pointer-events-none"></div>
+          
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="max-w-4xl mx-auto text-center relative z-10"
+          >
+            <h2 className="text-4xl md:text-6xl font-bold mb-6">Siap meroketkan omset Anda?</h2>
+            <p className="text-xl text-blue-200 mb-10 max-w-2xl mx-auto">Bergabunglah dengan ribuan pelaku bisnis yang telah mengotomatiskan marketing mereka bersama MaveCode AI.</p>
+            <Link href="/dashboard">
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-10 py-5 rounded-full bg-white text-blue-600 hover:bg-gray-100 font-bold text-lg shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all"
               >
-                <span>Masuk ke Dashboard</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+                Mulai Dashboard Anda Sekarang
+              </motion.button>
+            </Link>
+          </motion.div>
+        </section>
+      </main>
 
-      {/* ─── FOOTER ─── */}
-      <footer className="border-t border-foreground/5 py-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center space-x-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/></svg>
-              </div>
-              <span className="text-sm font-bold gradient-text">MaveCode AI</span>
-            </div>
-            <p className="text-xs text-foreground/40">
-              &copy; {new Date().getFullYear()} MaveCode AI. All rights reserved. Built with ❤️ by MAVERICK.
-            </p>
-            <div className="flex items-center space-x-4">
-              <a href="#" className="text-foreground/40 hover:text-foreground transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-              </a>
-              <a href="#" className="text-foreground/40 hover:text-foreground transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-              </a>
-              <a href="#" className="text-foreground/40 hover:text-foreground transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-              </a>
-            </div>
+      <footer className="border-t border-white/5 py-12 px-6 text-center text-gray-500 text-sm">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center space-x-2">
+            <div className="w-6 h-6 rounded bg-gradient-to-br from-blue-500 to-purple-600"></div>
+            <span className="font-bold text-white">MaveCode AI</span>
+          </div>
+          <p>© {new Date().getFullYear()} MaveCode AI Automation. All rights reserved.</p>
+          <div className="flex space-x-4">
+            <a href="#" className="hover:text-white transition-colors">Privacy</a>
+            <a href="#" className="hover:text-white transition-colors">Terms</a>
+            <a href="#" className="hover:text-white transition-colors">Contact</a>
           </div>
         </div>
       </footer>

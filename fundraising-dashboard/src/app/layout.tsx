@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import RootLayoutInner from "@/components/RootLayoutInner";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { AuthProvider } from "@/components/AuthProvider";
+import { AuthGuard } from "@/components/AuthGuard";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
 });
 
@@ -25,10 +23,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <RootLayoutInner>
-          {children}
-        </RootLayoutInner>
+      <body className={`${jakarta.variable} font-sans antialiased`}>
+        <AuthProvider>
+          <ThemeProvider>
+            <AuthGuard>
+              <RootLayoutInner>
+                {children}
+              </RootLayoutInner>
+            </AuthGuard>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );
