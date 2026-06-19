@@ -63,12 +63,12 @@ app.get('/api/broadcasts', (req, res) => {
 });
 
 // Create/Schedule a broadcast
-app.post('/api/broadcasts', upload.single('mediaFile'), (req, res) => {
+app.post('/api/broadcasts', upload.array('mediaFiles'), (req, res) => {
     const { target, message, time } = req.body;
-    let mediaPath = null;
+    let mediaPaths = [];
 
-    if (req.file) {
-        mediaPath = req.file.path;
+    if (req.files && req.files.length > 0) {
+        mediaPaths = req.files.map(file => file.path);
     }
 
     if (!target || !message) {
@@ -79,7 +79,7 @@ app.post('/api/broadcasts', upload.single('mediaFile'), (req, res) => {
         id: uuidv4(),
         target,
         message,
-        media: mediaPath,
+        media: mediaPaths.length > 0 ? mediaPaths : null,
         type: time ? "scheduled" : "immediate",
         status: time ? "pending" : "sending",
         time: time || null,
@@ -134,33 +134,70 @@ function sendBroadcast(id) {
 
     console.log(`[${new Date().toISOString()}] Sending Broadcast ID: ${id} to ${b.target}`);
 
-    let args = [
-        OPENCLAW_PATH,
-        'message', 'send',
-        '--target', b.target,
-        '--message', b.message
-    ];
+    const mediaList = Array.isArray(b.media) ? b.media : (b.media ? [b.media] : []);
 
-    if (b.media) {
-        args.push('--media', b.media);
-    }
+    const executeOpenClaw = (mediaItem, msgText, callback) => {
+        let args = [
+            OPENCLAW_PATH,
+            'message', 'send',
+            '--target', b.target
+        ];
 
-    const process = spawn('node', args);
+        if (msgText) {
+            args.push('--message', msgText);
+        }
 
-    let stdoutData = "";
-    let stderrData = "";
+        if (mediaItem) {
+            args.push('--media', mediaItem);
+        }
 
-    process.stdout.on('data', (data) => {
-        stdoutData += data.toString();
-        console.log(`[STDOUT] ${data.toString().trim()}`);
-    });
+        const process = spawn('node', args);
+        let stdoutData = "";
+        let stderrData = "";
 
-    process.stderr.on('data', (data) => {
-        stderrData += data.toString();
-        console.error(`[STDERR] ${data.toString().trim()}`);
-    });
+        process.stdout.on('data', (data) => {
+            stdoutData += data.toString();
+            console.log(`[STDOUT] ${data.toString().trim()}`);
+        });
 
-    process.on('close', (code) => {
+        process.stderr.on('data', (data) => {
+            stderrData += data.toString();
+            console.error(`[STDERR] ${data.toString().trim()}`);
+        });
+
+        process.on('close', (code) => {
+            callback(code, stdoutData, stderrData);
+        });
+    };
+
+    // Recursive function to send multiple media files sequentially
+    const sendSequentially = (index) => {
+        if (index === 0 && mediaList.length === 0) {
+            // No media, just send text
+            executeOpenClaw(null, b.message, finishBroadcast);
+            return;
+        }
+
+        if (index >= mediaList.length) {
+            finishBroadcast(0, "All media sent", "");
+            return;
+        }
+
+        // Send the text message only with the first media item
+        const msgText = index === 0 ? b.message : "";
+        
+        executeOpenClaw(mediaList[index], msgText, (code, stdout, stderr) => {
+            if (code !== 0) {
+                // If one fails, fail the whole broadcast
+                finishBroadcast(code, stdout, stderr);
+            } else {
+                // Wait 2 seconds before sending the next one to avoid rate limits
+                setTimeout(() => sendSequentially(index + 1), 2000);
+            }
+        });
+    };
+
+    const finishBroadcast = (code, stdoutData, stderrData) => {
         broadcasts = getBroadcasts();
         index = broadcasts.findIndex(x => x.id === id);
         if (index === -1) return;
@@ -183,7 +220,10 @@ function sendBroadcast(id) {
         }
 
         saveBroadcasts(broadcasts);
-    });
+    };
+
+    // Start sending
+    sendSequentially(0);
 }
 
 // ----------------------------------------------------

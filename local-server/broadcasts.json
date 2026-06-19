@@ -94,5 +94,29 @@
     "createdAt": "2026-06-19T09:52:18.112Z",
     "executedAt": "2026-06-19T09:53:09.915Z",
     "error": null
+  },
+  {
+    "id": "c2bf8086-4046-488a-84d4-ef10676f0875",
+    "target": "120363408705731444@g.us",
+    "message": "*🏕️FR PYLC🏕️*\n📢 READY AYAM PENYET KETUMBAR, MASIHH ANGETT YUU DIBELI!!\n\n💸Cuma 22k aja💸\n\n🍗ayam bumbu ketumbar yg bumbunya nagih\n🌶️+free sambal\n\nLANGSUNG ANTAR SEKARANG JUGA!\n\nSlot terbatas, jangan sampai kehabisan‼️\n\n📲+62 895-0491-9474\n      +62 812-1431-8731",
+    "media": null,
+    "type": "scheduled",
+    "status": "sent",
+    "time": "2026-06-19T16:59",
+    "createdAt": "2026-06-19T09:58:12.002Z",
+    "executedAt": "2026-06-19T09:59:17.834Z",
+    "error": null
+  },
+  {
+    "id": "de073dba-43aa-40bf-9d15-67cb9ab295cd",
+    "target": "120363408705731444@g.us",
+    "message": "Piscok 1",
+    "media": null,
+    "type": "immediate",
+    "status": "sent",
+    "time": null,
+    "createdAt": "2026-06-19T09:59:52.760Z",
+    "executedAt": "2026-06-19T09:59:59.460Z",
+    "error": null
   }
 ]
